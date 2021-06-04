@@ -7,10 +7,10 @@ class Users(models.Model):
     first_name = models.CharField(max_length=50)
 
     last_name = models.CharField(max_length=50)
-    username = models.CharField(max_length=50)(unique_key=True)
+    username = models.CharField(max_length=50, unique_key=True)
     password = models.CharField(min_length=8)
-    email = models.CharField(max_length=100)(unique_key=True)
-    phone_number = models.CharField(length=11)(unique_key=True)
+    email = models.CharField(max_length=100, unique_key=True)
+    phone_number = models.CharField(length=11, unique_key=True)
     house_number = models.CharField(length=11)
     gender = models.CharField()
     year_born = models.DateTimeField()
