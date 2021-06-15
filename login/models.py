@@ -12,7 +12,10 @@ class User(AbstractUser):
     error_messages={
             'unique': "A user with that email already exists.",
         },)
-    phone_number = models.CharField(max_length=11, unique=True, null=True)
+    phone_number = models.CharField(max_length=11, unique=True, null=True,
+    error_messages={
+            'unique': "A user with that phone number already exists.",
+        })
     gender = models.CharField(max_length=8, null=True)
     year_born = models.DateTimeField(null=True)
     is_advisor = models.BooleanField(default=False)
