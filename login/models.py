@@ -66,7 +66,7 @@ class User(AbstractUser):
     objects = Manager()
 
     class Advisor(models.Model):
-        advisor = models.ForeignKey("User", on_delete=models.CASCADE)
+        user = models.ForeignKey("User", on_delete=models.CASCADE)
         is_mental_advisor = models.BooleanField(default=False)
         is_family_advisor = models.BooleanField(default=False)
         is_religious_advisor = models.BooleanField(default=False)
@@ -78,13 +78,13 @@ class User(AbstractUser):
                                      })
 
 
-advise_method = models.CharField(choices=(
-    ('on', 'online'),
-    ('off', 'offline'),
-    ('b', 'both'),
-), max_length=3)
+        advise_method = models.CharField(choices=(
+            ('on', 'online'),
+            ('off', 'offline'),
+            ('b', 'both'),
+        ), max_length=3)
 
-address = models.CharField("advisor address", max_length=300)
+        address = models.CharField("advisor address", max_length=300)
 
-telephone = models.CharField(max_length=11)
+        telephone = models.CharField(max_length=11)
 
