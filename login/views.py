@@ -1,19 +1,21 @@
 from django.shortcuts import render
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
-from .models import User
-from .serializer import UserSerializer, RegisterSerializer
+from .models import Advisor, User
+from .serializer import RegisterSerializer,UserSerializer,AdvisorSerializer
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions
 from knox.models import AuthToken
-
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
+from rest_framework import generics
 
 
 #run this command for knox
 #   pip install django-rest-knox
+#   pip install drf-spectacular
 
 
 
@@ -24,7 +26,7 @@ class SignUpAPI(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response({
-        "user": UserSerializer(user).data,
+        # "user": UserSerializer(user).data,
         "token": AuthToken.objects.create(user)[1]
         })
 
@@ -40,4 +42,20 @@ class LoginAPI(KnoxLoginView):
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
+
+class UserInfoAPI(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+    def get_object(self):
+        return self.request.user
+
+
+class AdvisorInfoAPI(generics.RetrieveUpdateAPIView):
+    serializer_class = AdvisorSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self):
+        return Advisor.objects.get(user_id=self.request.user.id)
 
