@@ -1,22 +1,35 @@
+from re import T
 from django.contrib.auth import authenticate
 from django.db.models import fields
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
+from rest_framework.fields import ReadOnlyField
 from .models import Advisor, User
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from django.contrib.auth.hashers import make_password
+
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id','email','password','first_name','last_name','phone_number','gender','year_born','is_advisor','image']
+       
+
+    def update(self, instance, validated_data):
+        super(UserSerializer, self).update(instance, validated_data)
+        
+        instance.password = make_password(validated_data.get('password', instance.password))
+        instance.save()
+        return instance
+        
 
 
 class AdvisorSerializer(serializers.ModelSerializer):
     class Meta:
         model= Advisor
         fields = '__all__'
-
+        read_only_fields = ['user']
 
 
 
@@ -114,3 +127,47 @@ class RegisterSerializer(serializers.Serializer):
                     telephone=validated_data['telephone'])   
 
         return user  
+
+
+class SearchSerializer(serializers.Serializer):
+
+    fullname = serializers.CharField(allow_blank=True)
+
+class SearchInfoSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    first_name = serializers.CharField()
+
+    last_name = serializers.CharField()
+
+    password = serializers.CharField()
+
+    phone_number = serializers.CharField()
+
+    gender = serializers.CharField()
+
+    year_born = serializers.DateTimeField()
+
+    is_advisor = serializers.BooleanField()
+
+    image = serializers.ImageField()
+
+
+
+    is_mental_advisor = serializers.BooleanField(allow_null=True)
+
+    is_family_advisor = serializers.BooleanField(allow_null=True)
+
+    is_religious_advisor = serializers.BooleanField(allow_null=True)
+
+    is_healthcare_advisor = serializers.BooleanField(allow_null=True)
+
+    is_ejucation_advisor = serializers.BooleanField(allow_null=True)
+
+    meli_code = serializers.CharField(allow_null=True)
+
+    advise_method = serializers.CharField(allow_null=True)
+
+    address = serializers.CharField(allow_null=True)
+
+    telephone = serializers.CharField(allow_null=True)
