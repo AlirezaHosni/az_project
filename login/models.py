@@ -63,7 +63,8 @@ class User(AbstractUser):
     objects = Manager()
 
 class Advisor(models.Model):
-        user = models.ForeignKey("User", on_delete=models.CASCADE)
+
+        user = models.OneToOneField("User", on_delete=models.CASCADE)
         is_mental_advisor = models.BooleanField(default=False, null=True)
         is_family_advisor = models.BooleanField(default=False, null=True)
         is_religious_advisor = models.BooleanField(default=False, null=True)
