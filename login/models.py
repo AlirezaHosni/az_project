@@ -63,8 +63,7 @@ class User(AbstractUser):
     objects = Manager()
 
 class Advisor(models.Model):
-
-        user = models.OneToOneField("User", on_delete=models.CASCADE)
+        user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='user')
         is_mental_advisor = models.BooleanField(default=False, null=True)
         is_family_advisor = models.BooleanField(default=False, null=True)
         is_religious_advisor = models.BooleanField(default=False, null=True)
@@ -84,4 +83,17 @@ class Advisor(models.Model):
         address = models.CharField("advisor address", max_length=300, null=True)
 
         telephone = models.CharField(max_length=11, null=True)
+
+        objects = models.Manager()
+
+
+class Request(models.Model):
+    receiver = models.ForeignKey("Advisor",  models.CASCADE)
+    sender = models.ForeignKey("User" , models.CASCADE)
+    request_content = models.TextField(null=True)
+    is_checked = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(null=True)
+    is_accepted = models.BooleanField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_Done = models.BooleanField(default=False)
     
