@@ -1,10 +1,11 @@
 from re import T
 from django.contrib.auth import authenticate
 from django.db.models import fields
+from django.http import request
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.fields import ReadOnlyField
-from .models import Advisor, User
+from .models import Advisor, User, Request
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.contrib.auth.hashers import make_password
 
@@ -35,59 +36,30 @@ class AdvisorSerializer(serializers.ModelSerializer):
 
 
 
-# Register Serializer
-# class RegisterUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id','email', 'password', 'phone_number', 'first_name', 'last_name', 
-#             'gender', 'year_born', 'is_advisor']
-#         extra_kwargs = {'password': {'write_only': True}}
-
-#     def create(self, validated_data):
-#         user = User.objects.create_user(email=validated_data['email'], password=validated_data['password'],phone_number=validated_data['phone_number'], first_name=validated_data['first_name'], last_name=validated_data['last_name'],is_advisor=validated_data['is_advisor'])            
-#         return user
-
 
 
 
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
     first_name = serializers.CharField()
-
     last_name = serializers.CharField()
-
     password = serializers.CharField()
-
     phone_number = serializers.CharField()
-
     gender = serializers.CharField()
-
     year_born = serializers.DateTimeField()
-
     is_advisor = serializers.BooleanField()
-
     image = serializers.ImageField()
 
 
-
     is_mental_advisor = serializers.BooleanField(allow_null=True)
-
     is_family_advisor = serializers.BooleanField(allow_null=True)
-
     is_religious_advisor = serializers.BooleanField(allow_null=True)
-
     is_healthcare_advisor = serializers.BooleanField(allow_null=True)
-
     is_ejucation_advisor = serializers.BooleanField(allow_null=True)
-
     meli_code = serializers.CharField(allow_null=True)
-
     advise_method = serializers.CharField(allow_null=True)
-
     address = serializers.CharField(allow_null=True)
-
     telephone = serializers.CharField(allow_null=True)
 
     # def validate(self, attrs):
@@ -129,45 +101,56 @@ class RegisterSerializer(serializers.Serializer):
         return user  
 
 
-class SearchSerializer(serializers.Serializer):
-
-    fullname = serializers.CharField(allow_blank=True)
-
 class SearchInfoSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
     first_name = serializers.CharField()
-
     last_name = serializers.CharField()
-
     password = serializers.CharField()
-
     phone_number = serializers.CharField()
-
     gender = serializers.CharField()
-
     year_born = serializers.DateTimeField()
-
-    is_advisor = serializers.BooleanField()
-
     image = serializers.ImageField()
 
 
-
     is_mental_advisor = serializers.BooleanField(allow_null=True)
-
     is_family_advisor = serializers.BooleanField(allow_null=True)
-
     is_religious_advisor = serializers.BooleanField(allow_null=True)
-
     is_healthcare_advisor = serializers.BooleanField(allow_null=True)
-
     is_ejucation_advisor = serializers.BooleanField(allow_null=True)
-
     meli_code = serializers.CharField(allow_null=True)
-
     advise_method = serializers.CharField(allow_null=True)
-
     address = serializers.CharField(allow_null=True)
-
     telephone = serializers.CharField(allow_null=True)
+
+
+
+class RequestSerializer(serializers.Serializer):
+    
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    gender = serializers.CharField()
+    image = serializers.ImageField()
+
+    #request model fields
+    id = serializers.CharField()
+    request_content = serializers.CharField()
+    is_checked = serializers.BooleanField()
+    is_blocked = serializers.BooleanField()
+    is_accepted = serializers.BooleanField()
+    created_at = serializers.DateTimeField()
+    is_Done = serializers.BooleanField()
+
+
+class RequestUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Request
+        fields = ['is_accepted', 'is_blocked']
+
+    # def update(self, instance, validated_data):
+    #     super(RequestUpdateSerializer, self).update(instance, validated_data)
+        
+    #     instance.is_accepted = validated_data.get('is_accepted', instance.is_accepted)
+    #     instance.is_blocked = validated_data.get('is_blocked', instance.is_blocked)
+    #     instance.save()
+    #     return instance
