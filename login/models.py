@@ -66,7 +66,7 @@ class Advisor(models.Model):
         user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='user')
         is_mental_advisor = models.BooleanField(default=False, null=True)
         is_family_advisor = models.BooleanField(default=False, null=True)
-        is_religious_advisor = models.BooleanField(default=False, null=True)
+        is_sport_advisor = models.BooleanField(default=False, null=True)
         is_healthcare_advisor = models.BooleanField(default=False, null=True)
         is_ejucation_advisor = models.BooleanField(default=False, null=True)
         meli_code = models.CharField(max_length=10, unique=True, null=True,
