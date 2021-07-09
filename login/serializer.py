@@ -2,6 +2,7 @@ from re import T
 from django.contrib.auth import authenticate
 from django.db.models import fields
 from django.http import request
+from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.fields import ReadOnlyField
@@ -54,7 +55,7 @@ class RegisterSerializer(serializers.Serializer):
 
     is_mental_advisor = serializers.BooleanField(allow_null=True)
     is_family_advisor = serializers.BooleanField(allow_null=True)
-    is_religious_advisor = serializers.BooleanField(allow_null=True)
+    is_sport_advisor = serializers.BooleanField(allow_null=True)
     is_healthcare_advisor = serializers.BooleanField(allow_null=True)
     is_ejucation_advisor = serializers.BooleanField(allow_null=True)
     meli_code = serializers.CharField(allow_null=True)
@@ -90,7 +91,7 @@ class RegisterSerializer(serializers.Serializer):
             advisor = Advisor.objects.create(user_id=user.id,
                     is_mental_advisor=validated_data['is_mental_advisor'],
                     is_family_advisor=validated_data['is_family_advisor'],
-                    is_religious_advisor=validated_data['is_religious_advisor'],
+                    is_sport_advisor=validated_data['is_sport_advisor'],
                     is_healthcare_advisor=validated_data['is_healthcare_advisor'],
                     is_ejucation_advisor=validated_data['is_ejucation_advisor'],
                     meli_code=validated_data['meli_code'],
@@ -114,7 +115,7 @@ class SearchInfoSerializer(serializers.Serializer):
 
     is_mental_advisor = serializers.BooleanField(allow_null=True)
     is_family_advisor = serializers.BooleanField(allow_null=True)
-    is_religious_advisor = serializers.BooleanField(allow_null=True)
+    is_sport_advisor = serializers.BooleanField(allow_null=True)
     is_healthcare_advisor = serializers.BooleanField(allow_null=True)
     is_ejucation_advisor = serializers.BooleanField(allow_null=True)
     meli_code = serializers.CharField(allow_null=True)
@@ -145,7 +146,7 @@ class RequestSerializer(serializers.Serializer):
 class RequestUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
-        fields = ['is_accepted', 'is_blocked']
+        fields = ['is_checked','is_accepted', 'is_blocked']
 
     # def update(self, instance, validated_data):
     #     super(RequestUpdateSerializer, self).update(instance, validated_data)
@@ -154,3 +155,23 @@ class RequestUpdateSerializer(serializers.ModelSerializer):
     #     instance.is_blocked = validated_data.get('is_blocked', instance.is_blocked)
     #     instance.save()
     #     return instance
+
+
+class CreateRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Request
+        fields = ['request_content', 'receiver']
+
+    def create(self, validated_data):
+        return Request.objects.create(request_content=validated_data['request_content'],
+            receiver_id=validated_data['receiver'].id, sender_id=self.context['request'].user.id)
+
+
+
+# class RateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ...
+#         fields = []
+
+#     def create(self, validated_data):
+#         return ....objects.create(validated_data())
