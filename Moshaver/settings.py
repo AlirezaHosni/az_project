@@ -30,7 +30,8 @@ SECRET_KEY = 'django-insecure-+bik9$*c=$q1xc^u6+lr^s8s!#b!ct1==*uh6=d_-&+q2b$(k#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", '').split(
+    " ") if os.environ.get("DJANGO_ALLOWED_HOSTS", '') else []
 
 
 # Application definition
@@ -86,10 +87,11 @@ WSGI_APPLICATION = 'Moshaver.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'moshaver',
-        'USER': 'root',
-        'PASSWORD': '',
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
+        "NAME": os.environ.get("SQL_DATABASE", "moshaver"),
+        "USER": os.environ.get("SQL_USER", "root"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", ""),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
     }
 }
 
@@ -161,3 +163,22 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     # OTHER SETTINGS
 }
+
+WSGI_APPLICATION = 'Moshaver.wsgi.application'
+
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static-files'
+]
+
+STATIC_ROOT = BASE_DIR / 'static'  # change it in deployment to public_html dir
+STATIC_URL = '/static/'
+
+MEDIA_ROOT = BASE_DIR / 'media'  # change it in deployment to public_html dir
+MEDIA_URL = '/media/'
+
+# checklist for production : STATIC_ROOT, MEDIA_ROOT, DEBUG, ALLOWED_HOSTS, Database

@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  moshaver-api:
+    build: .
+    image: moshaver-api:latest
+    container_name: moshaver-api
+    restart: always
+    ports:
+      - 127.0.0.1:6005:8000
+    env_file:
+      - .env.prod
+    networks:
+      - mysql-network
+    external_links:
+      - mysql
+    volumes:
+      - /srv/moshaver-api/media:/app/media
+      - /srv/moshaver-api/static:/app/static
+      - /srv/moshaver-api/migrations:/app/login/migrations
+
+networks:
+  mysql-network:
+    external: true
