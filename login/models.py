@@ -97,3 +97,14 @@ class Request(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_Done = models.BooleanField(default=False)
     
+
+class Rate(models.Model):
+    advisor = models.ForeignKey("Advisor", models.CASCADE)
+    user = models.ForeignKey("User", models.CASCADE)
+    text = models.CharField(max_length=300)
+    rate = models.CharField(max_length=1, choices=(('1','1'), ('2','2'), ('3','3'), ('4','4'), ('5','5')))
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Advisor_History(models.Model):
+    advisor = models.ForeignKey("Advisor", on_delete=models.CASCADE)
+    granted_prize = models.CharField(max_length=300)
