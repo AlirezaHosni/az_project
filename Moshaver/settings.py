@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'login',
     'knox',
     'drf_spectacular',
+    'chat',
 ]
 
 MIDDLEWARE = [
