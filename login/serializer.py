@@ -5,9 +5,7 @@ from django.http import request
 from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
-from rest_framework.fields import ReadOnlyField
-from .models import Advisor, User, Request
-from rest_framework.authtoken.serializers import AuthTokenSerializer
+from .models import Advisor, User, Request, Rate, Advisor_History
 from django.contrib.auth.hashers import make_password
 
 
@@ -33,12 +31,17 @@ class AdvisorSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user']
 
-
-
-
-
-
-
+    def create(self, validated_data):
+        return Advisor.objects.create(user_id=self.context['request'].user.id, 
+            is_mental_advisor = validated_data['is_mental_advisor'],
+            is_family_advisor = validated_data['is_family_advisor'],
+            is_sport_advisor = validated_data['is_sport_advisor'],
+            is_healthcare_advisor = validated_data['is_healthcare_advisor'],
+            is_ejucation_advisor = validated_data['is_ejucation_advisor'],
+            meli_code = validated_data['meli_code'],
+            advise_method = validated_data['advise_method'],
+            address= validated_data['address'],
+            telephone = validated_data['telephone'])
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -103,10 +106,12 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class SearchInfoSerializer(serializers.Serializer):
+    advisor_id = serializers.CharField()
+    rate = serializers.CharField()
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    password = serializers.CharField()
+    
     phone_number = serializers.CharField()
     gender = serializers.CharField()
     year_born = serializers.DateTimeField()
@@ -142,20 +147,7 @@ class RequestSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField()
     is_Done = serializers.BooleanField()
 
-
-class RequestUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Request
-        fields = ['is_checked','is_accepted', 'is_blocked']
-
-    # def update(self, instance, validated_data):
-    #     super(RequestUpdateSerializer, self).update(instance, validated_data)
-        
-    #     instance.is_accepted = validated_data.get('is_accepted', instance.is_accepted)
-    #     instance.is_blocked = validated_data.get('is_blocked', instance.is_blocked)
-    #     instance.save()
-    #     return instance
-
+ 
 
 class CreateRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -168,10 +160,74 @@ class CreateRequestSerializer(serializers.ModelSerializer):
 
 
 
-# class RateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ...
-#         fields = []
+class RateSerializer(serializers.ModelSerializer):
+     class Meta:
+         model = Rate
+         fields = ['text', 'rate', 'advisor']
 
-#     def create(self, validated_data):
-#         return ....objects.create(validated_data())
+     def create(self, validated_data):
+         return Rate.objects.create(text=validated_data['text'],
+          rate=validated_data['rate'], user_id=self.context['request'].user.id, 
+          advisor_id=validated_data['advisor'].id)
+
+
+
+class ListRateSerializer(serializers.Serializer):
+    text = serializers.CharField()
+    rate = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    image = serializers.ImageField()
+    
+
+class AdvisorResumeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advisor_History
+        fields = ['id','granted_prize']
+
+    def create(self, validated_data):
+         return Advisor_History.objects.create(advisor_id=Advisor.objects.get(user=self.context['request'].user.id).id,
+         granted_prize=validated_data['granted_prize'])
+
+
+class RequestUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Request
+        fields = ['is_checked','is_accepted', 'is_blocked', 'sender']
+        read_only_fields = ['sender']
+        
+
+class professionFinder(serializers.Serializer):
+    profession = serializers.CharField()
+   
+
+class RateFinderSerializer(serializers.Serializer):
+    advisor_id = serializers.CharField()
+
+
+class AdvisorInfoSerializer(serializers.Serializer):
+    
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    phone_number = serializers.CharField()
+    gender = serializers.CharField()
+    year_born = serializers.DateTimeField()
+    image = serializers.ImageField()
+
+
+    is_mental_advisor = serializers.BooleanField(allow_null=True)
+    is_family_advisor = serializers.BooleanField(allow_null=True)
+    is_sport_advisor = serializers.BooleanField(allow_null=True)
+    is_healthcare_advisor = serializers.BooleanField(allow_null=True)
+    is_ejucation_advisor = serializers.BooleanField(allow_null=True)
+    meli_code = serializers.CharField(allow_null=True)
+    advise_method = serializers.CharField(allow_null=True)
+    address = serializers.CharField(allow_null=True)
+    telephone = serializers.CharField(allow_null=True)
+
+    rate = serializers.CharField()
+    advisor_id = serializers.CharField()
+    
