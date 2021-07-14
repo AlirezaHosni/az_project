@@ -86,8 +86,7 @@ class RegisterSerializer(serializers.Serializer):
         user = User.objects.create_user(email=validated_data['email'], password=validated_data['password'],
             phone_number=validated_data['phone_number'], first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],is_advisor=validated_data['is_advisor'],
-            gender=validated_data['gender'], year_born=validated_data['year_born'], 
-            image=validated_data['image'])    
+            gender=validated_data['gender'], year_born=validated_data['year_born'])    
 
         if user.is_advisor == True:
 
