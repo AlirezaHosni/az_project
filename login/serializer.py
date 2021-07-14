@@ -53,7 +53,7 @@ class RegisterSerializer(serializers.Serializer):
     gender = serializers.CharField()
     year_born = serializers.DateTimeField()
     is_advisor = serializers.BooleanField()
-    image = serializers.ImageField(required=False)
+
 
 
     is_mental_advisor = serializers.BooleanField(allow_null=True)
@@ -87,7 +87,7 @@ class RegisterSerializer(serializers.Serializer):
             phone_number=validated_data['phone_number'], first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],is_advisor=validated_data['is_advisor'],
             gender=validated_data['gender'], year_born=validated_data['year_born'], 
-            image=validated_data['image'])    
+           )
 
         if user.is_advisor == True:
 

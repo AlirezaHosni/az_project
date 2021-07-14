@@ -89,9 +89,9 @@ WSGI_APPLICATION = 'Moshaver.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
-        "NAME": os.environ.get("SQL_DATABASE", "moshaver"),
+        "NAME": os.environ.get("SQL_DATABASE", "moshaver_db"),
         "USER": os.environ.get("SQL_USER", "root"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", ""),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "al!reza1379"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
     }
 }
@@ -147,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'knox.auth.TokenAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
