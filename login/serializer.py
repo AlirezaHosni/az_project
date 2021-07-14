@@ -53,7 +53,7 @@ class RegisterSerializer(serializers.Serializer):
     gender = serializers.CharField()
     year_born = serializers.DateTimeField()
     is_advisor = serializers.BooleanField()
-    image = serializers.ImageField()
+    image = serializers.ImageField(required=False)
 
 
     is_mental_advisor = serializers.BooleanField(allow_null=True)

@@ -40,14 +40,14 @@ class Manager(UserManager):
 
 # Create your models here.
 class User(AbstractUser):
-   
+    GENDER = [ ('M','male'),('F','female')]
     username = None
     email = models.EmailField(unique=True, null=True)
     phone_number = models.CharField(max_length=11, unique=True, null=True,
     error_messages={
             'unique': "کاربری با این شماره تماس از قبل موجود میباشد",
         })
-    gender = models.CharField(max_length=8, null=True)
+    gender = models.CharField(choices=GENDER,max_length=8, null=True)
     year_born = models.DateTimeField(null=True)
     is_advisor = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -61,6 +61,15 @@ class User(AbstractUser):
     # for using ImageField you should run this command from the cmd:
     #  pip install pillow
     objects = Manager()
+
+    def save(self, *args, **kwargs):
+        if (self.image is None or self.image == "") and self.gender == 'F':
+            self.image = "static-files/images/female-user.png"
+            super().save(*args, **kwargs)
+        if (self.image is None or self.image == "") and self.gender == 'M':
+            self.image = "static-files/images/male-user.png"
+            super().save(*args, **kwargs)
+
 
 class Advisor(models.Model):
         user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='user')
@@ -104,6 +113,7 @@ class Rate(models.Model):
     text = models.CharField(max_length=300)
     rate = models.CharField(max_length=1, choices=(('1','1'), ('2','2'), ('3','3'), ('4','4'), ('5','5')))
     created_at = models.DateTimeField(auto_now_add=True)
+
 
 class Advisor_History(models.Model):
     advisor = models.ForeignKey("Advisor", on_delete=models.CASCADE)
