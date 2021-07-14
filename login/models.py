@@ -63,6 +63,7 @@ class User(AbstractUser):
     objects = Manager()
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if (self.image is None or self.image == "") and self.gender == 'F':
             self.image = "static-files/images/female-user.png"
             super().save(*args, **kwargs)
