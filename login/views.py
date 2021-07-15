@@ -198,3 +198,13 @@ class BestAdvisorsByProfessionAPI(generics.ListAPIView):
         profession = serilized.validated_data['profession']
         
         return Advisor.objects.raw('select r.id,advisor_id,COUNT(rate),avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r inner join (select a.id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where '+profession+' = true) as res on advisor_id =res.id group by advisor_id order by rate desc')
+
+    
+    
+  
+class GetUserImageAPI(APIView):
+    
+    def get(self, request):
+        img = User.objects.get(id = self.request.user.id).image
+        return HttpResponse(img, content_type="image/png")
+
