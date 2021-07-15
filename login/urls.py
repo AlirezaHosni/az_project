@@ -23,6 +23,7 @@ urlpatterns = [
     path('create-advisor/', CreateAdvisor.as_view()),
     path('all-advisors/', GetAllAdvisorsAPI.as_view()),
     path('particular-advisors/', BestAdvisorsByProfessionAPI.as_view()),
+    path('get-user-image/', GetUserImageAPI.as_view()),
 
 
     
