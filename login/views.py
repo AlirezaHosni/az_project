@@ -19,7 +19,7 @@ from rest_framework import generics
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from rest_framework import filters
-
+from django.http import HttpResponse
 
 #run this command for knox
 #   pip install django-rest-knox
