@@ -212,14 +212,13 @@ class GetUserImageAPI(APIView):
     
 class ImageApiView(generics.RetrieveAPIView):
 
-    renderer_classes = [JpegRenderer, PngRenderer]
+    renderer_classes = [PngRenderer]
 
     def get(self, request, *args, **kwargs):
         queryset = User.objects.get(id=self.kwargs['id']).image
         data = queryset
-        list = data.split(".")
-        list.reverse()
-        if list[0] == "jpg":
-            return Response(data, content_type='image/jpg')
-        elif list[0] == "png":
-            return Response(data, content_type='image/png')
+        
+        
+        return Response(data, content_type='image/png')
+        
+        #return Response(data, content_type='image/png')
