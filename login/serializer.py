@@ -106,7 +106,7 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class SearchInfoSerializer(serializers.Serializer):
-    advisor_id = serializers.CharField()
+    id = serializers.CharField()
     rate = serializers.CharField()
     email = serializers.EmailField()
     first_name = serializers.CharField()

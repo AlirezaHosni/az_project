@@ -19,7 +19,7 @@ from rest_framework import generics
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from rest_framework import filters
-
+from django.http import HttpResponse
 
 #run this command for knox
 #   pip install django-rest-knox
@@ -78,7 +78,7 @@ class SearchAdvisorAPI(generics.ListAPIView):
 
     def get_queryset(self):
         search_name = self.request.GET.get('search')
-        return User.objects.raw('select r.id,advisor_id,COUNT(rate),avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r inner join (select a.id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where first_name like %s or last_name like %s) as res on advisor_id =res.id group by advisor_id order by rate desc', ["%"+search_name+"%", "%"+search_name+"%"])
+        return User.objects.raw('select res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where first_name like %s or last_name like %s) as res on advisor_id =res.id group by res.id order by rate desc', ["%"+search_name+"%", "%"+search_name+"%"])
     
 
 class SendRequestAPI(generics.CreateAPIView):
@@ -171,7 +171,7 @@ class GetAllAdvisorsAPI(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return User.objects.raw('select * from login_user as u inner join login_advisor as a on u.id = a.user_id') 
+        return User.objects.raw('select res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id) as res on advisor_id =res.id group by res.id order by rate desc') 
 
 
 # class GetParticularAdvisorsAPI(generics.ListAPIView):
@@ -198,3 +198,13 @@ class BestAdvisorsByProfessionAPI(generics.ListAPIView):
         profession = serilized.validated_data['profession']
         
         return Advisor.objects.raw('select r.id,advisor_id,COUNT(rate),avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r inner join (select a.id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where '+profession+' = true) as res on advisor_id =res.id group by advisor_id order by rate desc')
+
+    
+    
+  
+class GetUserImageAPI(APIView):
+    
+    def get(self, request):
+        img = User.objects.get(id = self.request.user.id).image
+        return HttpResponse(img, content_type="image/png")
+

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI
+from .views import GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI
 from knox import views as knox_views
 
 
@@ -23,6 +23,7 @@ urlpatterns = [
     path('create-advisor/', CreateAdvisor.as_view()),
     path('all-advisors/', GetAllAdvisorsAPI.as_view()),
     path('particular-advisors/', BestAdvisorsByProfessionAPI.as_view()),
+    path('get-user-image/', GetUserImageAPI.as_view()),
 
 
     
