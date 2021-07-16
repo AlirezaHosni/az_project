@@ -17,7 +17,7 @@ services:
     volumes:
       - /srv/moshaver-api/media:/app/media
       - /srv/moshaver-api/static:/app/static
-      - /srv/moshaver-api/migrations:/app/login/migrations
+    
 
 networks:
   mysql-network:
