@@ -24,7 +24,7 @@ urlpatterns = [
     path('all-advisors/', GetAllAdvisorsAPI.as_view()),
     path('particular-advisors/', BestAdvisorsByProfessionAPI.as_view()),
     path('get-user-image/', GetUserImageAPI.as_view()),
-
+    path('get-profile-image/', ImageApiView.as_view()),
 
     
 ]
