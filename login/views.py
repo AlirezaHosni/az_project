@@ -215,7 +215,7 @@ class ImageApiView(generics.RetrieveAPIView):
     renderer_classes = [JpegRenderer, PngRenderer]
 
     def get(self, request, *args, **kwargs):
-        queryset = User.objects.get(id=self.request.user.id).image
+        queryset = User.objects.get(id=self.kwargs['id']).image
         data = queryset
         list = data.split(".")
         list.reverse()
