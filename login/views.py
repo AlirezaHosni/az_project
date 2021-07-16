@@ -20,7 +20,7 @@ from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from rest_framework import filters
 from django.http import HttpResponse
-
+from .custom_renderer import JpegRenderer, PngRenderer
 #run this command for knox
 #   pip install django-rest-knox
 #   pip install drf-spectacular
@@ -208,3 +208,13 @@ class GetUserImageAPI(APIView):
         img = User.objects.get(id = self.request.user.id).image
         return HttpResponse(img, content_type="image/png")
 
+    
+    
+class ImageApiView(generics.RetrieveAPIView):
+
+    renderer_classes = [JpegRenderer]
+
+    def get(self, request, *args, **kwargs):
+        queryset = User.objects.get(id=self.request.user.id).image
+        data = queryset
+        return Response(data, content_type='image/jpg')
