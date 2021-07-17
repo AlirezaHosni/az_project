@@ -173,7 +173,7 @@ WSGI_APPLICATION = 'Moshaver.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static-files'
+    BASE_DIR / 'media/static-files'
 ]
 
 STATIC_ROOT = BASE_DIR / 'static'  # change it in deployment to public_html dir

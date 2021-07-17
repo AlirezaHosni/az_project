@@ -64,11 +64,11 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if (self.image is None or self.image == "") and self.gender == 'F':
-            self.image = "images/female-user.png"
+        if (self.image is None or str(self.image) == "") and self.gender == 'F':
+            self.image = "static-files/images/female-user.png"
             super().save(*args, **kwargs)
-        if (self.image is None or self.image == "") and self.gender == 'M':
-            self.image = "images/male-user.png"
+        if (self.image is None or str(self.image) == "") and self.gender == 'M':
+            self.image = "static-files/images/male-user.png"
             super().save(*args, **kwargs)
 
 
