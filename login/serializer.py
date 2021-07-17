@@ -106,12 +106,13 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class SearchInfoSerializer(serializers.Serializer):
+    user_id = serializers.CharField()
     id = serializers.CharField()
     rate = serializers.CharField()
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    
+    number_of_rates = serializers.IntegerField()
     phone_number = serializers.CharField()
     gender = serializers.CharField()
     year_born = serializers.DateTimeField()
@@ -127,7 +128,6 @@ class SearchInfoSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
-
 
 
 class RequestSerializer(serializers.Serializer):
