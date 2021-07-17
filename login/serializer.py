@@ -18,9 +18,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         super(UserSerializer, self).update(instance, validated_data)
-        
-        instance.password = make_password(validated_data.get('password', instance.password))
-        instance.save()
+        if len(validated_data.get('password', instance.password)) < 30:
+            instance.password = make_password(validated_data.get('password', instance.password))
+            instance.save()
         return instance
         
 
