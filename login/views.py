@@ -193,9 +193,8 @@ class BestAdvisorsByProfessionAPI(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        serilized = professionFinder(data=self.request.data)
-        serilized.is_valid()
-        profession = serilized.validated_data['profession']
+        
+        profession = self.kwargs['profession']
         
         return Advisor.objects.raw('select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where '+profession+' = true) as res on advisor_id =res.id group by res.id order by rate desc')
         
