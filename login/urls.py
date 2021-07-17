@@ -22,7 +22,7 @@ urlpatterns = [
     path('update-advisor-resume/<int:granted_prize_id>/', UpdateAdvisorResumeAPI.as_view()),
     path('create-advisor/', CreateAdvisor.as_view()),
     path('all-advisors/', GetAllAdvisorsAPI.as_view()),
-    path('particular-advisors/', BestAdvisorsByProfessionAPI.as_view()),
+    path('particular-advisors/<str:profession>/', BestAdvisorsByProfessionAPI.as_view()),
     path('get-user-image/', GetUserImageAPI.as_view()),
     path('get-profile-image/<id>', ImageApiView.as_view()),
 
