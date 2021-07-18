@@ -13,8 +13,8 @@ class CreateChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['student_id', 'advisor', 'title','student','time_changed']
-        read_only_fields = ['advisor', 'title','student','time_changed']
+        fields = ['student_id', 'advisor', 'title','student','time_changed','id']
+        read_only_fields = ['advisor', 'title','student','time_changed','id']
 
     def create(self, validated_data):
 
@@ -41,6 +41,7 @@ class CreateChatSerializer(serializers.ModelSerializer):
         validated_data['advisor'] = advisor
         validated_data['student'] = student
         validated_data['time_changed'] = instance.time_started
+        validated_data['chat_id'] = instance.id
 
         return validated_data
 
