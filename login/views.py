@@ -149,6 +149,16 @@ class ListAdvisorResumeAPI(generics.ListCreateAPIView):
         advisor = Advisor.objects.get(user=self.request.user.id)
         return Advisor_History.objects.raw('select id, granted_prize from login_advisor_history where advisor_id=%s', [advisor.id])
 
+    
+class ListAdvisorResumeByAdvisorIdAPI(generics.ListCreateAPIView):
+    serializer_class = AdvisorResumeSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        advisor_id = self.kwargs['advisor_id']
+        return Advisor_History.objects.raw('select id, granted_prize from login_advisor_history where advisor_id=%s', [advisor_id])
+ 
+    
 
 class UpdateAdvisorResumeAPI(generics.UpdateAPIView):
     serializer_class = AdvisorResumeSerializer
