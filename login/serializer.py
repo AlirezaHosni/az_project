@@ -173,6 +173,7 @@ class RateSerializer(serializers.ModelSerializer):
 
 
 class ListRateSerializer(serializers.Serializer):
+    user_id = serializers.CharField()
     text = serializers.CharField()
     rate = serializers.CharField()
     created_at = serializers.DateTimeField()
