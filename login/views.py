@@ -103,7 +103,7 @@ class AdvisorRequestsInfoAPI(generics.ListAPIView):
     
 
     def get_queryset(self):
-        return Request.objects.raw('select email,first_name,last_name,gender,image,r.id,request_content,is_checked,is_blocked,is_accepted,created_at,is_Done from login_user as u inner join login_request as r on u.id=r.sender_id where r.receiver_id in (select a.id from login_advisor as a inner join login_user as u on a.user_id=u.id where u.id=%s) and is_checked=false', [self.request.user.id])
+        return Request.objects.raw('select r.sender_id as sender_id, email,first_name,last_name,gender,image,r.id,request_content,is_checked,is_blocked,is_accepted,created_at,is_Done from login_user as u inner join login_request as r on u.id=r.sender_id where r.receiver_id in (select a.id from login_advisor as a inner join login_user as u on a.user_id=u.id where u.id=%s) and is_checked=false', [self.request.user.id])
 
 
 class RequestUpdateStatus(generics.UpdateAPIView):
