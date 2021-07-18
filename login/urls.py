@@ -16,7 +16,7 @@ urlpatterns = [
     path('advisor-requests/', AdvisorRequestsInfoAPI.as_view()),
     path('send-request/', SendRequestAPI.as_view()),
     path('users-comments/', ListRateAPI.as_view()),
-    path('users-comments-by-advisor-id/', ListRateByAdvisorIdAPI.as_view()),
+    path('users-comments-by-advisor-id/<int:advisor_id>/', ListRateByAdvisorIdAPI.as_view()),
     path('create-comment/', CreateRateAPI.as_view()),
     path('advisor-resume/', ListAdvisorResumeAPI.as_view()),
     path('update-advisor-resume/<int:granted_prize_id>/', UpdateAdvisorResumeAPI.as_view()),
