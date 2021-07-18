@@ -131,7 +131,7 @@ class SearchInfoSerializer(serializers.Serializer):
 
 
 class RequestSerializer(serializers.Serializer):
-    
+    sender_id = serializers.CharField()
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
