@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI
+from .views import ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI
 from knox import views as knox_views
 
 
@@ -16,15 +16,16 @@ urlpatterns = [
     path('advisor-requests/', AdvisorRequestsInfoAPI.as_view()),
     path('send-request/', SendRequestAPI.as_view()),
     path('users-comments/', ListRateAPI.as_view()),
-    path('users-comments-by-advisor-id/', ListRateByAdvisorIdAPI.as_view()),
+    path('users-comments-by-advisor-id/<int:advisor_id>/', ListRateByAdvisorIdAPI.as_view()),
     path('create-comment/', CreateRateAPI.as_view()),
     path('advisor-resume/', ListAdvisorResumeAPI.as_view()),
     path('update-advisor-resume/<int:granted_prize_id>/', UpdateAdvisorResumeAPI.as_view()),
     path('create-advisor/', CreateAdvisor.as_view()),
     path('all-advisors/', GetAllAdvisorsAPI.as_view()),
-    path('particular-advisors/', BestAdvisorsByProfessionAPI.as_view()),
+    path('particular-advisors/<str:profession>/', BestAdvisorsByProfessionAPI.as_view()),
     path('get-user-image/', GetUserImageAPI.as_view()),
     path('get-profile-image/<id>', ImageApiView.as_view()),
-
+    path('advisor-resume-by-advisor-id/<int:advisor_id>/', ListAdvisorResumeByAdvisorIdAPI.as_view()),
+    
     
 ]
