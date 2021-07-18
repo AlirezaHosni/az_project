@@ -136,10 +136,9 @@ class ListRateByAdvisorIdAPI(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        serialized = RateFinderSerializer(data=self.request.data)
-        serialized.is_valid()
-        advisor_id = serialized.validated_data['advisor_id']
-        return Rate.objects.raw('select rate.id, rate.text, rate.rate, rate.created_at , user.first_name, user.last_name, user.image  from login_rate as rate inner join login_user as user on rate.user_id=user.id where rate.advisor_id in (select a.id from login_advisor as a inner join login_user as u on a.user_id=u.id where a.id=%s)', [advisor_id])
+
+        advisor_id = self.kwargs['advisor_id']
+        return Rate.objects.raw('select user.id as user_id, rate.id, rate.text, rate.rate, rate.created_at , user.first_name, user.last_name, user.image  from login_rate as rate inner join login_user as user on rate.user_id=user.id where rate.advisor_id in (select a.id from login_advisor as a inner join login_user as u on a.user_id=u.id where a.id=%s)', [advisor_id])
 
 
 class ListAdvisorResumeAPI(generics.ListCreateAPIView):
