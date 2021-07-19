@@ -10,7 +10,7 @@ urlpatterns = [
     path('logout/', knox_views.LogoutView.as_view()),
     path('user-profile/', UserInfoAPI.as_view()),
     path('advisor-profile/', AdvisorInfoAPI.as_view()),
-    path('search/', SearchAdvisorAPI.as_view()),
+    path('search/<str:search>/', SearchAdvisorAPI.as_view()),
     path('user-requests/', RequestsInfoAPI.as_view()),
     path('update-request-status/<int:id>/', RequestUpdateStatus.as_view()),
     path('advisor-requests/', AdvisorRequestsInfoAPI.as_view()),
