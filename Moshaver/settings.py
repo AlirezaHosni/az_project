@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'knox',
     'drf_spectacular',
     'chat',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -183,3 +184,11 @@ MEDIA_ROOT = BASE_DIR / 'media'  # change it in deployment to public_html dir
 MEDIA_URL = '/media/'
 
 # checklist for production : STATIC_ROOT, MEDIA_ROOT, DEBUG, ALLOWED_HOSTS, Database
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIT_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ostadmoshaverteam@gmail.com'
+EMAIL_HOST_PASSWORD = 'moshaver1400'

@@ -3,6 +3,11 @@ from re import search
 from django.db.models.query import QuerySet
 from django.http import request
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django_rest_passwordreset.signals import reset_password_token_created
+from django.core.mail import send_mail
+from django.dispatch import receiver
+from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
@@ -230,3 +235,25 @@ class ImageApiView(generics.RetrieveAPIView):
         return Response(data, content_type='image/png')
         
         #return Response(data, content_type='image/png')
+
+
+class CustomPasswordResetView:
+    @receiver(reset_password_token_created)
+    def password_reset_token_created(sender, reset_password_token, *args, **kwargs):
+        """
+          Handles password reset tokens
+          When a token is created, an e-mail needs to be sent to the user
+        """
+        # send an e-mail to the user
+        context ="لطفا برای بازیابی رمز خود به لینک زیر مراجعه کنید"+'\n'+"{}?token={}".format(reverse('password_reset:reset-password-request'), reset_password_token.key)
+
+        send_mail(
+            # title:
+            "Password Reset for {}".format('Ostad Moshaver'),
+            # message:
+            context,
+            # from:
+            "ostadmoshaverteam@gmail.com",
+            # to:
+            [reset_password_token.user.email]
+        )
