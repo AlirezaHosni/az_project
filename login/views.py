@@ -245,7 +245,7 @@ class CustomPasswordResetView:
           When a token is created, an e-mail needs to be sent to the user
         """
         # send an e-mail to the user
-        context ="لطفا برای بازیابی رمز خود به لینک زیر مراجعه کنید"+'\n'+"{}?token={}".format(reverse('password_reset:reset-password-request'), reset_password_token.key)
+        context ="لطفا برای بازیابی رمز خود به لینک زیر مراجعه کنید"+'\n'+"https://api.moshaver.markop.ir/{}?token={}".format(reverse('password_reset:reset-password-request'), reset_password_token.key)
 
         send_mail(
             # title:
