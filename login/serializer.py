@@ -60,7 +60,7 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField()
     phone_number = serializers.CharField()
     gender = serializers.CharField()
-    year_born = serializers.DateTimeField()
+    year_born = serializers.DateTimeField(allow_null=True)
     is_advisor = serializers.BooleanField()
 
     is_mental_advisor = serializers.BooleanField(allow_null=True)
