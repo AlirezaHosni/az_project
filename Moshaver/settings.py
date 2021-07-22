@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'chat',
     'django_rest_passwordreset',
+    'password_reset',
 ]
 
 MIDDLEWARE = [
