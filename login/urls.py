@@ -26,5 +26,6 @@ urlpatterns = [
     path('get-user-image/', GetUserImageAPI.as_view()),
     path('get-profile-image/<id>', ImageApiView.as_view()),
     path('advisor-resume-by-advisor-id/<int:advisor_id>/', ListAdvisorResumeByAdvisorIdAPI.as_view()),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     
 ]
