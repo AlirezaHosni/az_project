@@ -30,9 +30,11 @@ SECRET_KEY = 'django-insecure-+bik9$*c=$q1xc^u6+lr^s8s!#b!ct1==*uh6=d_-&+q2b$(k#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", '').split(
-    " ") if os.environ.get("DJANGO_ALLOWED_HOSTS", '') else []
+# A list of strings representing the host/domain names that this Django site can serve.
+ALLOWED_HOSTS = ['*']
 
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -55,6 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
