@@ -5,7 +5,7 @@ from django.http import request
 from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
-from .models import Advisor, User, Request, Rate, Advisor_History
+from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document
 from django.contrib.auth.hashers import make_password
 
 
@@ -72,21 +72,8 @@ class RegisterSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
+    doc_images = serializers.ListField(child=serializers.ImageField())
 
-    # def validate(self, attrs):
-    #     email = attrs.get('email')
-    #     password = attrs.get('password')
-
-    #     if email and password:
-    #         user = authenticate(request=self.context.get('request'),
-    #             email=email, password=password)
-
-    #         if user:
-    #             raise
-    #     else:
-    #         raise
-
-    #     return attrs
 
     def create(self, validated_data):
 
@@ -127,8 +114,29 @@ class RegisterSerializer(serializers.Serializer):
                                              advise_method=validated_data['advise_method'],
                                              address=validated_data['address'],
                                              telephone=validated_data['telephone'])
+                                             
+            for image in validated_data['doc_images']:
+                Advisor_Document.objects.create(advisor_id=advisor.id,
+                                                doc_image=image
+                                                )
 
         return user
+
+
+    # def validate(self, attrs):
+    #     email = attrs.get('email')
+    #     password = attrs.get('password')
+
+    #     if email and password:
+    #         user = authenticate(request=self.context.get('request'),
+    #             email=email, password=password)
+
+    #         if user:
+    #             raise
+    #     else:
+    #         raise
+
+    #     return attrs
 
 
 class SearchInfoSerializer(serializers.Serializer):
@@ -251,3 +259,13 @@ class AdvisorInfoSerializer(serializers.Serializer):
 
     rate = serializers.CharField()
     advisor_id = serializers.CharField()
+
+
+class AdvisorDocSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advisor_Document
+        fields = '__all__'
+
+        def create(self, validated_data):
+            return Advisor_Document.objects.create(advisor_id=Advisor.objects.get(user=self.context['request'].user.id).id,
+                                                doc_image=validated_data['doc_image'])

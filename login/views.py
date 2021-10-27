@@ -11,8 +11,8 @@ from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
-from .models import Advisor, User, Request, Rate, Advisor_History
-from .serializer import RateFinderSerializer, AdvisorInfoSerializer, professionFinder, AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, RequestSerializer, SearchInfoSerializer,RegisterSerializer,UserSerializer,AdvisorSerializer
+from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document
+from .serializer import AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, RequestSerializer, SearchInfoSerializer,RegisterSerializer,UserSerializer,AdvisorSerializer
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import mixins, permissions
@@ -263,3 +263,16 @@ class CustomPasswordResetView:
             # to:
             [reset_password_token.user.email]
         )
+
+
+class ListParticularAdvisorDocuments(generics.ListAPIView):
+    serializer_class=AdvisorDocSerializer
+
+    def get_queryset(self):
+         advisor_id = self.kwargs['advisor_id']
+         return Advisor_Document.objects.raw('select * from login_advisor_document where advisor_id=%s', [advisor_id])
+
+
+    
+
+

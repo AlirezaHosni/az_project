@@ -2,6 +2,7 @@ from django import apps
 from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.db.models.fields.files import ImageField
 
 
 
@@ -54,9 +55,7 @@ class User(AbstractUser):
     last_modified = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-    
 
-    # picture???
     image = models.ImageField(null=True, blank=True, upload_to="images/")
     # for using ImageField you should run this command from the cmd:
     #  pip install pillow
@@ -82,18 +81,15 @@ class Advisor(models.Model):
         meli_code = models.CharField(max_length=10, unique=True, null=True,
                                      error_messages={
                                          'unique': "کاربری با این کد ملی از قبل موجود میباشد",
-                                     })
-                                     
+                                     })                           
         advise_method = models.CharField(choices=(
             ('on', 'online'),
             ('off', 'offline'),
             ('b', 'both'),
         ), max_length=3, null=True)
-
         address = models.CharField("advisor address", max_length=300, null=True)
-
         telephone = models.CharField(max_length=11, null=True)
-
+        is_verified = models.BooleanField(default=False, null=True)
         objects = models.Manager()
 
 
@@ -119,3 +115,16 @@ class Rate(models.Model):
 class Advisor_History(models.Model):
     advisor = models.ForeignKey("Advisor", on_delete=models.CASCADE)
     granted_prize = models.CharField(max_length=300)
+
+
+
+class Advisor_Document(models.Model):
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    doc_image = models.ImageField(null=True, blank=True, upload_to="Documents/")
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    advisor = models.ForeignKey("Advisor", on_delete=models.CASCADE, related_name='advisor')
+
+
+class Student(models.Model):
+    studnet_number = models.CharField(max_length=9, unique=True)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
