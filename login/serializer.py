@@ -72,7 +72,7 @@ class RegisterSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
-    doc_images = serializers.ListField(child=serializers.ImageField())
+    doc_images = serializers.ListField(child=serializers.ImageField(), allow_empty=True)
 
 
     def create(self, validated_data):
