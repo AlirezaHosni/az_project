@@ -20,15 +20,15 @@ jobs:
       uses: actions/setup-python@v2
       with: 
         python-version: 3.7
-      - name: install dependencies
-        run: |
+    - name: install dependencies
+      run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: coverage report
-        run: |
+    - name: coverage report
+      run: |
           pip install coverage
           coverage run manage.py test
           coverage report
-      - name: django testing
-        run: |
+    - name: django testing
+      run: |
           python3 manage.py test
