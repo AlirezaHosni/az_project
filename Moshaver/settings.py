@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'chat',
     'django_rest_passwordreset',
-    
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -151,9 +151,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
-        'knox.auth.TokenAuthentication',
+        #'knox.auth.TokenAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
