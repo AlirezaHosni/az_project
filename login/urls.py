@@ -1,13 +1,13 @@
 from django.urls import path,include
-from .views import  ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI
+from .views import  Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI
 from knox import views as knox_views
-
+from rest_framework.authtoken.views import obtain_auth_token
 
 
 urlpatterns = [
     path('signup/', SignUpAPI.as_view()),
-    path('login/', LoginAPI.as_view()),
-    path('logout/', knox_views.LogoutView.as_view()),
+    path('login/', obtain_auth_token),
+    path('logout/', Logout.as_view()),
     path('user-profile/', UserInfoAPI.as_view()),
     path('advisor-profile/', AdvisorInfoAPI.as_view()),
     path('search/<str:search>/', SearchAdvisorAPI.as_view()),
