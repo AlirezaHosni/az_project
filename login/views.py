@@ -11,10 +11,11 @@ from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
-from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document
+from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
+from .permissions import IsAdvisor
 from .serializer import AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
-    RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer
+    RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import mixins, permissions
@@ -129,6 +130,12 @@ class RequestUpdateStatus(generics.UpdateAPIView):
         return Request.objects.get(id=self.kwargs['id'])
 
 
+class CreateInvitationAPI(generics.CreateAPIView):
+
+    serializer_class = CreateInvitationSerializer
+    permission_classes = [permissions.IsAuthenticated,IsAdvisor]
+
+    
 class CreateRateAPI(generics.CreateAPIView):
     serializer_class = RateSerializer
     permission_classes = (permissions.IsAuthenticated,)

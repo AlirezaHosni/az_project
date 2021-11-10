@@ -5,7 +5,8 @@ from django.http import request
 from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
-from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document
+from rest_framework.generics import get_object_or_404
+from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from django.contrib.auth.hashers import make_password
 
 
@@ -190,6 +191,40 @@ class CreateRequestSerializer(serializers.ModelSerializer):
         return Request.objects.create(request_content=validated_data['request_content'],
                                       receiver_id=validated_data['receiver'].id,
                                       sender_id=self.context['request'].user.id)
+
+
+class CreateInvitationSerializer(serializers.ModelSerializer):
+
+    student_id = serializers.IntegerField(write_only=True)
+    advisor = UserSerializer(read_only=True)
+    student = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Invitation
+        fields = ['request_content', 'advisor', 'student', 'student_id']
+
+    def create(self, validated_data):
+        
+        student = get_object_or_404(User,id=validated_data.pop('student_id'))
+        advisor_user = get_object_or_404(User,email=self.context['request'].user.email)
+        advisor = get_object_or_404(Advisor,User=advisor_user)
+
+        validated_data['advisor'] = advisor
+        validated_data['student'] = student
+
+        instance = super().create(validated_data)
+
+        return instance
+
+
+class ListInvitationSerializer(serializers.ModelSerializer):
+
+    advisor = AdvisorSerializer(read_only=True)
+    student = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Invitation
+        fields = ['advisor','student','invitation_content','created_at']
 
 
 class RateSerializer(serializers.ModelSerializer):

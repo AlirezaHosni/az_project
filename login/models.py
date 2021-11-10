@@ -102,6 +102,13 @@ class Request(models.Model):
     is_accepted = models.BooleanField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_Done = models.BooleanField(default=False)
+
+
+class Invitation(models.Model):
+    advisor = models.ForeignKey("Advisor",  models.CASCADE)
+    student = models.ForeignKey("User" , models.CASCADE)
+    invitation_content = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
 
 class Rate(models.Model):
