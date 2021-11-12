@@ -20,9 +20,9 @@ jobs:
       uses: mirromutth/mysql-action@v1.1
       with:
         mysql database: 'moshaver_db' # Optional, default value is "test". The specified database which will be create
-        mysql root password: 'YDP8mkt@zru@mez4udh' # Required if "mysql user" is empty, default is empty. The root superuser password
-        mysql user: 'moshaver' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: 'YDP8mkt@zru@mez4udh'
+        mysql root password: '' # Required if "mysql user" is empty, default is empty. The root superuser password
+        mysql user: 'root' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+        mysql password: ''
     - name: install python
       uses: actions/setup-python@v2
       with: 
