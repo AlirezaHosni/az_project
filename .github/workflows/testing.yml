@@ -21,7 +21,7 @@ jobs:
 
     services:
       mysql-master:
-        image: mysql 5.7
+        image: mysql:5.7
         ports:
           - 3306/tcp
         env:
