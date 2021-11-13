@@ -1,9 +1,9 @@
 name: django CI
-env:
-    MYSQL_DATABASE: moshaver_db
-    MYSQL_USER: root
-    MYSQL_PASSWORD: password
-    MYSQL_HOST: mysql-master
+# env:
+#     MYSQL_DATABASE: moshaver_db
+#     MYSQL_USER: root
+#     MYSQL_PASSWORD: password
+#     MYSQL_HOST: mysql-master
 
 on:
   push:
@@ -20,15 +20,27 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql-master:
+      mysql:
         image: mysql:5.7
-        ports:
-          - 3306/tcp
         env:
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ env.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-          MYSQL_ROOT-PASSWORD: ${{ env.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: moshaver_db
+          MYSQL_USER: root
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    # services:
+    #   mysql-master:
+    #     image: mysql:5.7
+    #     ports:
+    #       - 3306/tcp
+    #     env:
+    #       MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+    #       MYSQL_USER: ${{ env.MYSQL_USER }}
+    #       MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+    #       MYSQL_ROOT-PASSWORD: ${{ env.MYSQL_PASSWORD }}
 
     steps:
     - uses: actions/checkout@v2
@@ -48,6 +60,11 @@ jobs:
       uses: actions/setup-python@v2
       with: 
         python-version: 3.7
+    - name: Verify MySQL connection
+      run: |
+        mysql --version
+        sudo apt-get install -y mysql-client
+        mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uuser -psecret -e "SHOW DATABASES"
     - name: install dependencies
       run: |
           python -m pip install --upgrade pip
@@ -59,4 +76,9 @@ jobs:
           coverage report
     - name: django testing
       run: |
+          env:
+            MYSQL_DATABASE: moshaver_db
+            DB_USERNAME: root
+            DB_PASSWORD: password
+            DB_PORT: ${{ job.services.mysql.ports[3306] }}
           python3 manage.py test
