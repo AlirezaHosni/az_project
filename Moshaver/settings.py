@@ -97,7 +97,7 @@ DATABASES = {
         "NAME": os.environ.get("SQL_DATABASE", "moshaver_db"),
         "USER": os.environ.get("SQL_USER", "root"),
         "PASSWORD": os.environ.get("SQL_PASSWORD", ""),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "HOST": os.environ.get("SQL_HOST", "127.0.0.1"),
     }
 }
 
