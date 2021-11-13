@@ -1,9 +1,8 @@
 name: django CI
-# env:
-#     MYSQL_DATABASE: moshaver_db
-#     MYSQL_USER: root
-#     MYSQL_PASSWORD: password
-#     MYSQL_HOST: mysql-master
+env:
+    MYSQL_DATABASE: moshaver_db
+    MYSQL_USER: root
+    MYSQL_PASSWORD: password
 
 on:
   push:
