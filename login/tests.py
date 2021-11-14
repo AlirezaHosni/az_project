@@ -140,6 +140,11 @@ class RegisterTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
+    # def test_user_can_search_advisors(self):
+    #     response = self.client.get('/api/search/' + 'baba/')
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
 class AdvisorStuffTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -215,3 +220,35 @@ class AdvisorStuffTestCase(APITestCase):
     def test_user_can_get_profile_image(self):
         response = self.client.get('/api/get-profile-image/'+ str(self.user.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+##
+    def test_user_can_get_profile_info(self):
+        response = self.client.get('/api/user-profile/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # def test_user_cannot_get_another_user_profile(self):
+    #     response = self.client.get('/api/advisor-resume/')
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_user_can_update_profile(self):
+        data = {
+            "firstname": "blah blah",
+            "password": "12345678"
+        }
+        response = self.client.put('/api/user-profile/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    # def test_test_user_cannot_update_another_user_profile(self):
+    #     data = {
+    #         "granted_prize": "blah blah blah"
+    #     }
+    #     response = self.client.put('/api/update-advisor-resume/'+ str(self.advisor_resume.id) +'/', data)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    
+
+
+    
