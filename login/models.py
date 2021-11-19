@@ -135,3 +135,13 @@ class Advisor_Document(models.Model):
 class Student(models.Model):
     studnet_number = models.CharField(max_length=9, unique=True)
     user = models.ForeignKey("User", on_delete=models.CASCADE)
+
+
+class Notifiaction(models.Model):
+
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='user')
+    type = models.CharField(choices=(('i', 'invitation'), ('r', 'request')), max_length=1, null=True)
+    contacts = models.ManyToManyField("User", related_name='contacts')
+    seen = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+

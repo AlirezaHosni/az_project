@@ -6,7 +6,7 @@ from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.generics import get_object_or_404
-from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
+from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
 from django.contrib.auth.hashers import make_password
 
 
@@ -201,7 +201,7 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invitation
-        fields = ['request_content', 'advisor', 'student', 'student_id']
+        fields = ['invitation_content', 'advisor', 'student', 'student_id']
 
     def create(self, validated_data):
         
@@ -211,6 +211,8 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
 
         validated_data['advisor'] = advisor
         validated_data['student'] = student
+
+        Notifiaction.objects.create(user=student, type='i', contacts=advisor)
 
         instance = super().create(validated_data)
 
@@ -304,3 +306,13 @@ class AdvisorDocSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             return Advisor_Document.objects.create(advisor_id=Advisor.objects.get(user=self.context['request'].user.id).id,
                                                 doc_image=validated_data['doc_image'])
+
+
+
+class ListNotifiactionSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer(read_only=True)
+    contacts = UserSerializer(read_only=True, many=True)
+    class Meta:
+        model = Notifiaction
+        fields = fields = ['user', 'type', 'contacts', 'created_at']
