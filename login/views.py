@@ -29,7 +29,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import filters
 from django.http import HttpResponse
 from .custom_renderer import JpegRenderer, PngRenderer
-
+from rest_framework import status
 
 # run this command for knox
 #   pip install django-rest-knox
@@ -44,7 +44,7 @@ class SignUpAPI(APIView):
         user = serializer.save()
         return Response({
             # "user": UserSerializer(user).data,
-            "token": AuthToken.objects.create(user)[1]
+            # "token": Token.objects.get(user).key
         })
 
 
@@ -58,6 +58,12 @@ class LoginAPI(KnoxLoginView):
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
+
+class Logout(APIView):
+    def get(self, request, format=None):
+        # simply delete the token to force a login
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
 
 class UserInfoAPI(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
