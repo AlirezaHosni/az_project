@@ -139,7 +139,7 @@ class Student(models.Model):
 
 class Notifiaction(models.Model):
 
-    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='user')
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='user_notification')
     type = models.CharField(choices=(('i', 'invitation'), ('r', 'request')), max_length=1, null=True)
     contacts = models.ManyToManyField("User", related_name='contacts')
     seen = models.BooleanField(default=False)
