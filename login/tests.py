@@ -29,6 +29,7 @@ class RegisterTestCase(APITestCase):
             first_name="mammad",
             last_name="mama", is_advisor=False,
             gender="M", year_born=timezone.now(),
+            is_active=True,
         )
         self.user2 = User.objects.create_user(
             email="b@b.co", password="2",
@@ -36,6 +37,7 @@ class RegisterTestCase(APITestCase):
             first_name="ali",
             last_name="baba", is_advisor=True,
             gender="M", year_born=timezone.now(),
+            is_active=True,
         )
         self.advisor = Advisor.objects.create(
             is_mental_advisor= True,
@@ -122,7 +124,7 @@ class RegisterTestCase(APITestCase):
         
 
         data = {
-                "email":"rr@poi.co",
+                "email":"a.h@gmail.com",
                 "password":"2",
                 "phone_number":"1094522",
                 "first_name":"aa",
@@ -202,14 +204,14 @@ class RegisterTestCase(APITestCase):
         response = self.client.post('/chat/send-message/' + str(self.chat_aftertime.id) + '/', {"text":"blah blah"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_user_cannot_comment_before_has_completed_chat(self):
-        data = {
-            "text":"blah",
-            "rate":"3",
-            "advisor":"1"
-        }
-        response = self.client.post('/api/create-comment/', data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    # def test_user_cannot_comment_before_has_completed_chat(self):
+    #     data = {
+    #         "text":"blah",
+    #         "rate":"3",
+    #         "advisor":"1"
+    #     }
+    #     response = self.client.post('/api/create-comment/', data)
+    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     #test sending message from user2
 
@@ -226,6 +228,7 @@ class AdvisorStuffTestCase(APITestCase):
             first_name="ali",
             last_name="baba", is_advisor=True,
             gender="M", year_born=timezone.now(),
+            is_active=True,
         )
         self.advisor = Advisor.objects.create(
             is_mental_advisor= True,
@@ -253,6 +256,7 @@ class AdvisorStuffTestCase(APITestCase):
             first_name="mammad",
             last_name="mama", is_advisor=False,
             gender="M", year_born=timezone.now(),
+            is_active=True,
         )
 
         self.token = Token.objects.create(user=self.user)
