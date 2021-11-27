@@ -41,6 +41,7 @@ class Manager(UserManager):
 
 # Create your models here.
 class User(AbstractUser):
+    is_active = models.BooleanField(default=False)
     GENDER = [ ('M','male'),('F','female')]
     username = None
     email = models.EmailField(unique=True, null=True)
@@ -117,6 +118,7 @@ class Rate(models.Model):
     text = models.CharField(max_length=300)
     rate = models.CharField(max_length=1, choices=(('1','1'), ('2','2'), ('3','3'), ('4','4'), ('5','5')))
     created_at = models.DateTimeField(auto_now_add=True)
+    is_confirmed = models.BooleanField(default=False)
 
 
 class Advisor_History(models.Model):
@@ -145,3 +147,7 @@ class Notifiaction(models.Model):
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+class Email_Verification(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    key = models.CharField(max_length=64, unique=True)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)

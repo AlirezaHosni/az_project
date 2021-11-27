@@ -75,3 +75,9 @@ class MessageSerializer(serializers.ModelSerializer):
         chat.save()
 
         return instance
+
+
+class ChatUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chat_User
+        fields = '__all__'
