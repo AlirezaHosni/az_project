@@ -1,7 +1,6 @@
 from django.db import models
 from login.models import User
 
-
 # Create your models here.
 class Chat(models.Model):
     time_started = models.DateTimeField(auto_now_add=True)
@@ -22,6 +21,8 @@ class Chat_User(models.Model):
 
     chat = models.ForeignKey("Chat",on_delete=models.CASCADE,related_name='chats_users')
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='users_chat')
+    is_done = models.BooleanField(default=False)
+    chat_start_datetime = models.DateTimeField()
 
 
 class Message(models.Model):

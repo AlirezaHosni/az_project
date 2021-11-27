@@ -1,5 +1,6 @@
 # import unittest
 from login.models import User, Advisor, Advisor_Document, Advisor_History
+from chat.models import Chat, Chat_User, Message
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 from django.urls import reverse
@@ -12,6 +13,9 @@ import io
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 import base64
+from django.utils import timezone
+from datetime import timedelta
+
 
 # Create your tests here.
 
@@ -24,14 +28,14 @@ class RegisterTestCase(APITestCase):
             phone_number="1234",
             first_name="mammad",
             last_name="mama", is_advisor=False,
-            gender="M", year_born="2021-07-17 08:27:03",
+            gender="M", year_born=timezone.now(),
         )
         self.user2 = User.objects.create_user(
             email="b@b.co", password="2",
             phone_number="1234445",
             first_name="ali",
             last_name="baba", is_advisor=True,
-            gender="M", year_born="2021-07-17 08:27:03",
+            gender="M", year_born=timezone.now(),
         )
         self.advisor = Advisor.objects.create(
             is_mental_advisor= True,
@@ -49,7 +53,53 @@ class RegisterTestCase(APITestCase):
             doc_image = "Documents/Screenshot_283_HC31hdt.png",
             advisor_id = self.advisor.id
         )
-
+        self.chat_intime = Chat.objects.create(
+            time_started=timezone.now(),
+            time_changed=timezone.now(),
+            title="blah blah1"
+        )
+        self.chat_beforetime = Chat.objects.create(
+            time_started=timezone.now(),
+            time_changed=timezone.now(),
+            title="blah blah2"
+        )
+        self.chat_aftertime = Chat.objects.create(
+            time_started=timezone.now(),
+            time_changed=timezone.now(),
+            title="blah blah3"
+        )
+        self.chatuser = Chat_User.objects.create(
+            chat = self.chat_intime,
+            user=self.user,
+            chat_start_datetime=timezone.now()
+        )
+        self.chatuserDone = Chat_User.objects.create(
+            chat = self.chat_aftertime,
+            user=self.user,
+            is_done=True,
+            chat_start_datetime=timezone.now()
+        )
+        self.chatuserNotStarted = Chat_User.objects.create(
+            chat = self.chat_beforetime,
+            user=self.user,
+            chat_start_datetime=timezone.now() + timedelta(days=1)
+        )
+        self.chatuser2 = Chat_User.objects.create(
+            chat = self.chat_intime,
+            user=self.user2,
+            chat_start_datetime=timezone.now()
+        )
+        self.chatuserDone2 = Chat_User.objects.create(
+            chat = self.chat_aftertime,
+            user=self.user2,
+            is_done=True,
+            chat_start_datetime=timezone.now()
+        )
+        self.chatuserNotStarted2 = Chat_User.objects.create(
+            chat = self.chat_beforetime,
+            user=self.user2,
+            chat_start_datetime=timezone.now() + timedelta(days=1)
+        )
         self.token = Token.objects.create(user=self.user)
         print(self.token)
         self.api_authentication()
@@ -103,13 +153,13 @@ class RegisterTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-    def test_user_can_send_request(self):
-        data = {
-            "request_content": "hi how you doing",
-            "receiver": self.advisor.id
-        }
-        res = self.client.post('/api/send-request/', data)
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+    # def test_user_can_send_request(self):
+    #     data = {
+    #         "request_content": "hi how you doing",
+    #         "receiver": self.advisor.id
+    #     }
+    #     res = self.client.post('/api/send-request/', data)
+    #     self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
 
     
@@ -140,6 +190,29 @@ class RegisterTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
+    def test_user_can_send_message_intime(self):
+        response = self.client.post('/chat/send-message/' + str(self.chat_intime.id) + '/', {"text":"blah blah"})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_user_cannot_send_message_beforetime(self):
+        response = self.client.post('/chat/send-message/' + str(self.chat_beforetime.id) + '/', {"text":"blah blah"})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_cannot_send_message_aftertime(self):
+        response = self.client.post('/chat/send-message/' + str(self.chat_aftertime.id) + '/', {"text":"blah blah"})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_cannot_comment_before_has_completed_chat(self):
+        data = {
+            "text":"blah",
+            "rate":"3",
+            "advisor":"1"
+        }
+        response = self.client.post('/api/create-comment/', data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    
+    #test sending message from user2
+
     # def test_user_can_search_advisors(self):
     #     response = self.client.get('/api/search/' + 'baba/')
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -152,7 +225,7 @@ class AdvisorStuffTestCase(APITestCase):
             phone_number="1234445",
             first_name="ali",
             last_name="baba", is_advisor=True,
-            gender="M", year_born="2021-07-17 08:27:03",
+            gender="M", year_born=timezone.now(),
         )
         self.advisor = Advisor.objects.create(
             is_mental_advisor= True,
@@ -179,7 +252,7 @@ class AdvisorStuffTestCase(APITestCase):
             phone_number="1234",
             first_name="mammad",
             last_name="mama", is_advisor=False,
-            gender="M", year_born="2021-07-17 08:27:03",
+            gender="M", year_born=timezone.now(),
         )
 
         self.token = Token.objects.create(user=self.user)

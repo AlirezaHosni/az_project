@@ -11,9 +11,9 @@ from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
-from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
-from .permissions import IsAdvisor
-from .serializer import AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .models import Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
+from .permissions import CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
+from .serializer import UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -42,10 +42,32 @@ class SignUpAPI(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        confirmation_token = Email_Verification.objects.get(user_id=UserSerializer(user).data["id"]).key
+        print(confirmation_token)
+        #print(UserSerializer(user).data['id'])
+        #token = Token.objects.get(user).key
+        activate_link_url = "https://moshaver.markop.ir/"
+        actiavation_link = f'{activate_link_url}?user_id={UserSerializer(user).data["id"]}&confirmation_token={confirmation_token}'
+        # send an e-mail to the user
+        context = "لطفا برای فعالسازی حساب خود به لینک زیر مراجعه کنید" + '\n' + str(actiavation_link)
+
+        send_mail(
+            # title:
+            "فعالسازی حساب کاربری در مشاوره آنلاین",
+            # message:
+            context,
+            # from:
+            "ostadmoshaverteam@gmail.com",
+            # to:
+            [UserSerializer(user).data["email"]]
+        )
+
         return Response({
             # "user": UserSerializer(user).data,
-            # "token": Token.objects.get(user).key
+            #"token": Token.objects.get_or_create(UserSerializer(user).data).key
+            "Result":"Registeration was successfull!"
         })
+
 
 
 class LoginAPI(KnoxLoginView):
@@ -144,7 +166,7 @@ class CreateInvitationAPI(generics.CreateAPIView):
     
 class CreateRateAPI(generics.CreateAPIView):
     serializer_class = RateSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,IsChatExist,IsChatDone,)
 
 
 class ListRateAPI(generics.ListAPIView):
@@ -166,6 +188,24 @@ class ListRateByAdvisorIdAPI(generics.ListAPIView):
         return Rate.objects.raw(
             'select user.id as user_id, rate.id, rate.text, rate.rate, rate.created_at , user.first_name, user.last_name, user.image  from login_rate as rate inner join login_user as user on rate.user_id=user.id where rate.advisor_id in (select a.id from login_advisor as a inner join login_user as u on a.user_id=u.id where a.id=%s)',
             [advisor_id])
+
+class ListRateForAdminAPI(generics.ListAPIView):
+    serializer_class = ListRateSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_queryset(self):
+        return Rate.objects.raw(
+            'select user.id as user_id, rate.id, rate.text, rate.rate, rate.created_at , user.first_name, user.last_name, user.image  from login_rate as rate inner join login_user as user on rate.user_id=user.id where rate.is_confirmed=false'
+        )
+
+class UpdateRateStatusByAdminAPI(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UpdateRateSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser, IsNotConfirmed]
+
+    def get_object(self):
+        return Rate.objects.get(id=self.kwargs['id'])
+
+
 
 
 class ListAdvisorResumeAPI(generics.ListCreateAPIView):
@@ -319,3 +359,12 @@ class ListNotificationsAPI(generics.ListAPIView):
         updatedNotifiactions.save()
         
         return oldNotifiactions
+
+
+class ActivateAccountAPI(generics.UpdateAPIView):
+    serializer_class = UserVerificationSerializer
+    permission_classes = (permissions.AllowAny, CanBeActive)
+
+    def get_object(self):
+        return User.objects.get(id=self.kwargs['user_id'])
+        

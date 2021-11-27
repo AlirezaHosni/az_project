@@ -6,9 +6,9 @@ from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.generics import get_object_or_404
-from .models import Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
+from .models import Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
 from django.contrib.auth.hashers import make_password
-
+import secrets
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -103,6 +103,12 @@ class RegisterSerializer(serializers.Serializer):
                                         last_name=validated_data['last_name'], is_advisor=validated_data['is_advisor'],
                                         gender=validated_data['gender'], year_born=validated_data['year_born'],
                                         )
+
+        email_verification_token = Email_Verification.objects.create(
+            user_id=user.id,
+            key = secrets.token_urlsafe(8)
+        )
+
 
         if user.is_advisor == True:
             advisor = Advisor.objects.create(user_id=user.id,
@@ -248,6 +254,12 @@ class ListRateSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     image = serializers.ImageField()
+    is_confirmed = serializers.BooleanField()
+
+class UpdateRateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rate
+        fields ='__all__'
 
 
 class AdvisorResumeSerializer(serializers.ModelSerializer):
@@ -316,3 +328,11 @@ class ListNotifiactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notifiaction
         fields = fields = ['user', 'type', 'contacts', 'created_at']
+
+
+
+class UserVerificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'password', 'first_name', 'last_name', 'phone_number', 'gender', 'year_born',
+                  'is_advisor', 'image', 'is_active']
