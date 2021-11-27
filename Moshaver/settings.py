@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'knox',
     'drf_spectacular',
     'chat',
+    'questionnaire',
     'django_rest_passwordreset',
     'rest_framework.authtoken',
 ]
