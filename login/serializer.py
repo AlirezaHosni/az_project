@@ -341,13 +341,11 @@ class UserVerificationSerializer(serializers.ModelSerializer):
 class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
-        fields = ['user', 'advisor_user', 'reservation_datetime']
+        fields = [ 'advisor_user', 'reservation_datetime']
 
     def create(self, validated_data):
-        user_id = User.objects.get(email=validated_data['user']).id
         
-
-        chat = Chat.objects.create(title= str(user_id) +'_'+ str(validated_data['advisor_user'].id) + str(secrets.token_urlsafe(20)))
-        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= user_id)
+        chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['advisor_user'].id) + str(secrets.token_urlsafe(20)))
+        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= self.context['request'].user.id)
         Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= validated_data['advisor_user'].id)
-        return Reservation.objects.create(user_id=user_id, advisor_user_id=validated_data['advisor_user'].id, reservation_datetime=validated_data['reservation_datetime'])
+        return Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['advisor_user'].id, reservation_datetime=validated_data['reservation_datetime'])
