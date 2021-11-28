@@ -158,6 +158,7 @@ class Reservation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='useruser')
     advisor_user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='advisoruser')
     reservation_datetime = models.DateTimeField()
+    end_session_datetime = models.DateTimeField()
     advising_case = models.CharField(choices=(
             ('mental', 'mental'),
             ('family', 'family'),

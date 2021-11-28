@@ -11,9 +11,9 @@ from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
-from .models import Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
-from .permissions import CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .models import Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
+from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
+from .serializer import reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -371,7 +371,15 @@ class ActivateAccountAPI(generics.UpdateAPIView):
 
 class ListCreateReservation(generics.ListCreateAPIView):
     serializer_class = ReservationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, CanReserveDatetime]
 
     def get_queryset(self):
         return None
+
+
+class ListReservedDateTimeForParticularAdvisor(generics.ListAPIView):
+    serializer_class = reservedSessionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Reservation.objects.raw("select id, advisor_user_id, reservation_datetime, end_session_datetime from login_reservation where DATE('reservation_datetime') >= CURDATE()")

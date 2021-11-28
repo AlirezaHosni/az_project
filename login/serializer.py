@@ -1,5 +1,6 @@
 from re import T
 from django.contrib.auth import authenticate
+from django.db.models.fields import IntegerField
 from django.http import request
 from knox import models
 from rest_framework import serializers
@@ -9,6 +10,8 @@ from .models import Reservation, Email_Verification, Advisor, User, Request, Rat
 from chat.models import Chat_User, Chat
 from django.contrib.auth.hashers import make_password
 import secrets
+from datetime import timedelta
+# from django.utils import timezone
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -339,13 +342,24 @@ class UserVerificationSerializer(serializers.ModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
+    duration_min = serializers.IntegerField(write_only=True)
     class Meta:
         model = Reservation
-        fields = [ 'advisor_user', 'reservation_datetime']
+        fields = [ 'advisor_user', 'reservation_datetime', 'duration_min']
+        
 
     def create(self, validated_data):
         
         chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['advisor_user'].id) + str(secrets.token_urlsafe(20)))
         Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= self.context['request'].user.id)
         Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= validated_data['advisor_user'].id)
-        return Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['advisor_user'].id, reservation_datetime=validated_data['reservation_datetime'])
+        return Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['advisor_user'].id, 
+                reservation_datetime=validated_data['reservation_datetime'],
+                end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
+
+
+
+class reservedSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = ['advisor_user', 'reservation_datetime', 'end_session_datetime']

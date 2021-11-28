@@ -2,7 +2,9 @@ from django.core.mail import message
 from rest_framework import permissions, status
 from rest_framework.generics import get_object_or_404
 from chat.models import Chat_User
-from login.models import Rate, Email_Verification, User
+from login.models import Rate, Email_Verification, Reservation, User
+from datetime import timedelta
+from .serializer import ReservationSerializer
 
 
 
@@ -63,3 +65,22 @@ class CanBeActive(permissions.BasePermission):
             return True
 
         return False
+
+
+class CanReserveDatetime(permissions.BasePermission):
+    message = "این بازه زمانی قبلا رزرو شده است!"
+    def has_permission(self, request, view):
+        serialized_data = ReservationSerializer(data=request.data)
+        serialized_data.is_valid(raise_exception=True)
+        reservation_datetime = serialized_data.validated_data['reservation_datetime']
+        end_session_datetime = reservation_datetime + timedelta(minutes=serialized_data.validated_data['duration_min'])
+        advisor_user_id = serialized_data.validated_data['advisor_user'].id
+        print(advisor_user_id)
+        record_count = Reservation.objects.raw("select id, COUNT(*) as num_row from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s)",
+         [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime, advisor_user_id])
+
+        for n in record_count:
+            if n.num_row > 0:
+                return False
+
+        return True
