@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import  ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
+from .views import  ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
 from knox import views as knox_views
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -34,6 +34,6 @@ urlpatterns = [
     path('get-notifications', ListNotificationsAPI.as_view()),
     path('list-advisor-documents-by-advisor-id/<int:advisor_id>/', ListParticularAdvisorDocuments.as_view()),# check if the user is admin and loged in
     path('activation-account/<int:user_id>/<str:token>/', ActivateAccountAPI.as_view()),
-
+    path('list-or-create-reservation/', ListCreateReservation.as_view()),
 
 ]

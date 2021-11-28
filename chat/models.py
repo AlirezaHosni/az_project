@@ -5,7 +5,7 @@ from login.models import User
 class Chat(models.Model):
     time_started = models.DateTimeField(auto_now_add=True)
     time_changed = models.DateTimeField(null=True,blank=True)
-    title = models.CharField(max_length=40,unique=True,error_messages={
+    title = models.CharField(max_length=255,unique=True,error_messages={
             'unique': "هر چت فقط یکبار میتواند ساخته شود",
         })
 

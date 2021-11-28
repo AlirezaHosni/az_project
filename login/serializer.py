@@ -1,12 +1,12 @@
 from re import T
 from django.contrib.auth import authenticate
-from django.db.models import fields
 from django.http import request
 from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.generics import get_object_or_404
-from .models import Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
+from .models import Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
+from chat.models import Chat_User, Chat
 from django.contrib.auth.hashers import make_password
 import secrets
 
@@ -336,3 +336,18 @@ class UserVerificationSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'password', 'first_name', 'last_name', 'phone_number', 'gender', 'year_born',
                   'is_advisor', 'image', 'is_active']
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = ['user', 'advisor_user', 'reservation_datetime']
+
+    def create(self, validated_data):
+        user_id = User.objects.get(email=validated_data['user']).id
+        
+
+        chat = Chat.objects.create(title= str(user_id) +'_'+ str(validated_data['advisor_user'].id) + str(secrets.token_urlsafe(20)))
+        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= user_id)
+        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], chat_id= chat.id,user_id= validated_data['advisor_user'].id)
+        return Reservation.objects.create(user_id=user_id, advisor_user_id=validated_data['advisor_user'].id, reservation_datetime=validated_data['reservation_datetime'])

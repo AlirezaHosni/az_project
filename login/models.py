@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db.models.fields.files import ImageField
+from django.db.models.fields.related import ForeignKey
 
 
 
@@ -151,3 +152,17 @@ class Email_Verification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     key = models.CharField(max_length=64, unique=True)
     user = models.ForeignKey("User", on_delete=models.CASCADE)
+
+
+class Reservation(models.Model):
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='useruser')
+    advisor_user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='advisoruser')
+    reservation_datetime = models.DateTimeField()
+    advising_case = models.CharField(choices=(
+            ('mental', 'mental'),
+            ('family', 'family'),
+            ('sport', 'sport'),
+            ('healthcare', 'healthcare'),
+            ('education', 'education'),
+        ), max_length=11, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

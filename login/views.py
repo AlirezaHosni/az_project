@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
 from .models import Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .serializer import ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -368,3 +368,10 @@ class ActivateAccountAPI(generics.UpdateAPIView):
     def get_object(self):
         return User.objects.get(id=self.kwargs['user_id'])
         
+
+class ListCreateReservation(generics.ListCreateAPIView):
+    serializer_class = ReservationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return None
