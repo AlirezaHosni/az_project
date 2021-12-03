@@ -12,7 +12,7 @@ class IsAdvisor(permissions.BasePermission):
         return request.user.is_advisor
 
 class IsChatGetStarted(permissions.BasePermission):
-    message= "امکان ارسال پیام وجود ندارد"
+    message= "چت هنوز شروع نشده است و امکان ارسال پیام وجود ندارد"
     def has_permission(self, request, view):
         try:
             chat_user = Chat_User.objects.filter(user=request.user.id, chat=view.kwargs['id']).first()
@@ -20,6 +20,18 @@ class IsChatGetStarted(permissions.BasePermission):
             return False
         
         if timezone.now() < chat_user.chat_start_datetime:
+            return False
+        return True
+
+class IsChatFinishedAccordingToTime(permissions.BasePermission):
+    message = "چت بسته شده است و امکان ارسال پیام نیست"
+    def has_permission(self, request, view):
+        try:
+            chat_user = Chat_User.objects.filter(user=request.user.id, chat=view.kwargs['id']).first()
+        except(Chat_User.DoesNotExist):
+            return False
+        
+        if timezone.now() >= chat_user.end_session_datetime:
             return False
         return True
 
