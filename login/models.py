@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db.models.fields.files import ImageField
+from django.db.models.fields.related import ForeignKey
 
 
 
@@ -41,6 +42,7 @@ class Manager(UserManager):
 
 # Create your models here.
 class User(AbstractUser):
+    is_active = models.BooleanField(default=False)
     GENDER = [ ('M','male'),('F','female')]
     username = None
     email = models.EmailField(unique=True, null=True)
@@ -117,6 +119,7 @@ class Rate(models.Model):
     text = models.CharField(max_length=300)
     rate = models.CharField(max_length=1, choices=(('1','1'), ('2','2'), ('3','3'), ('4','4'), ('5','5')))
     created_at = models.DateTimeField(auto_now_add=True)
+    is_confirmed = models.BooleanField(default=False)
 
 
 class Advisor_History(models.Model):
@@ -145,3 +148,22 @@ class Notifiaction(models.Model):
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+class Email_Verification(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    key = models.CharField(max_length=64, unique=True)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+
+
+class Reservation(models.Model):
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='useruser')
+    advisor_user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='advisoruser')
+    reservation_datetime = models.DateTimeField()
+    end_session_datetime = models.DateTimeField()
+    advising_case = models.CharField(choices=(
+            ('mental', 'mental'),
+            ('family', 'family'),
+            ('sport', 'sport'),
+            ('healthcare', 'healthcare'),
+            ('education', 'education'),
+        ), max_length=11, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
