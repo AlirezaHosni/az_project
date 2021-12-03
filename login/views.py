@@ -354,9 +354,9 @@ class ListNotificationsAPI(generics.ListAPIView):
     def get_queryset(self):
 
         oldNotifiactions = Notifiaction.objects.filter(user=self.request.user.id).order_by('-created_at')
-        updatedNotifiactions = oldNotifiactions
-        updatedNotifiactions.seen = False
-        updatedNotifiactions.save()
+        # updatedNotifiactions = oldNotifiactions
+        # updatedNotifiactions.seen = False
+        # updatedNotifiactions.save()
         
         return oldNotifiactions
 
