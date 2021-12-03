@@ -4,7 +4,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import CreateChatSerializer, MessageSerializer,ChatListSerializer, ChatUserSerializer
-from .permissions import IsAdvisor, IsChatGetStarted, IsChatDone
+from .permissions import IsAdvisor, IsChatGetStarted, IsChatDone, IsChatFinishedAccordingToTime
 from .models import Message,Chat_User,Chat
 
 # Create your views here.
@@ -34,7 +34,7 @@ class ListMessageAPI(generics.ListCreateAPIView):
 
 class CreateMessageAPI(generics.CreateAPIView):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsChatGetStarted, IsChatDone]
+    permission_classes = [IsAuthenticated, IsChatGetStarted, IsChatDone, IsChatFinishedAccordingToTime]
 
 
 class UpdateChatStatus(generics.UpdateAPIView):

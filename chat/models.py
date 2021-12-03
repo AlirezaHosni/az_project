@@ -23,6 +23,7 @@ class Chat_User(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='users_chat')
     is_done = models.BooleanField(default=False)
     chat_start_datetime = models.DateTimeField()
+    end_session_datetime = models.DateTimeField()
 
 
 class Message(models.Model):
