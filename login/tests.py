@@ -73,34 +73,40 @@ class RegisterTestCase(APITestCase):
         self.chatuser = Chat_User.objects.create(
             chat = self.chat_intime,
             user=self.user,
-            chat_start_datetime=timezone.now()
+            chat_start_datetime=timezone.now(),
+            end_session_datetime=timezone.now() + timedelta(minutes=30)
         )
         self.chatuserDone = Chat_User.objects.create(
             chat = self.chat_aftertime,
             user=self.user,
             is_done=True,
-            chat_start_datetime=timezone.now()
+            chat_start_datetime=timezone.now(),
+            end_session_datetime=timezone.now() + timedelta(minutes=30)
         )
         self.chatuserNotStarted = Chat_User.objects.create(
             chat = self.chat_beforetime,
             user=self.user,
-            chat_start_datetime=timezone.now() + timedelta(days=1)
+            chat_start_datetime=timezone.now() + timedelta(days=1),
+            end_session_datetime=timezone.now() + timedelta(minutes=30)
         )
         self.chatuser2 = Chat_User.objects.create(
             chat = self.chat_intime,
             user=self.user2,
-            chat_start_datetime=timezone.now()
+            chat_start_datetime=timezone.now(),
+            end_session_datetime=timezone.now() + timedelta(minutes=30)
         )
         self.chatuserDone2 = Chat_User.objects.create(
             chat = self.chat_aftertime,
             user=self.user2,
             is_done=True,
-            chat_start_datetime=timezone.now()
+            chat_start_datetime=timezone.now(),
+            end_session_datetime=timezone.now() + timedelta(minutes=30)
         )
         self.chatuserNotStarted2 = Chat_User.objects.create(
             chat = self.chat_beforetime,
             user=self.user2,
-            chat_start_datetime=timezone.now() + timedelta(days=1)
+            chat_start_datetime=timezone.now() + timedelta(days=1),
+            end_session_datetime=timezone.now() + timedelta(minutes=30)
         )
         self.token = Token.objects.create(user=self.user)
         print(self.token)
