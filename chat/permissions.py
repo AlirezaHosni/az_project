@@ -36,7 +36,7 @@ class IsChatFinishedAccordingToTime(permissions.BasePermission):
         return True
 
 class IsChatDone(permissions.BasePermission):
-    message = "چت به اتمام رسیده است"
+    message = "چت توسط مشاور به اتمام رسیده است"
 
     def has_permission(self, request, view):
         try:

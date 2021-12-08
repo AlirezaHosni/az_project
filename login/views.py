@@ -30,6 +30,8 @@ from rest_framework import filters
 from django.http import HttpResponse
 from .custom_renderer import JpegRenderer, PngRenderer
 from rest_framework import status
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 # run this command for knox
 #   pip install django-rest-knox
@@ -69,6 +71,15 @@ class SignUpAPI(APIView):
         })
 
 
+class LoginUserAPI(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        user.status = 'online'
+        user.save()
+        return Response({'token': token.key})
 
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
@@ -84,6 +95,8 @@ class LoginAPI(KnoxLoginView):
 class Logout(APIView):
     def get(self, request, format=None):
         # simply delete the token to force a login
+        request.user.status = 'offline'
+        request.user.save()
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
 
@@ -127,7 +140,7 @@ class SearchAdvisorAPI(generics.ListAPIView):
 
 class SendRequestAPI(generics.CreateAPIView):
     serializer_class = CreateRequestSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,CanReserveDatetime,CanReserveDatetime,)
 
 
 class RequestsInfoAPI(generics.ListAPIView):
@@ -152,7 +165,7 @@ class AdvisorRequestsInfoAPI(generics.ListAPIView):
 
 class RequestUpdateStatus(generics.UpdateAPIView):
     serializer_class = RequestUpdateSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, CanReserveDatetime,)
 
     def get_object(self):
         return Request.objects.get(id=self.kwargs['id'])
@@ -383,3 +396,8 @@ class ListReservedDateTimeForParticularAdvisor(generics.ListAPIView):
 
     def get_queryset(self):
         return Reservation.objects.raw("select id, advisor_user_id, reservation_datetime, end_session_datetime from login_reservation where DATE('reservation_datetime') >= CURDATE()")
+
+
+# class InMomentReservationAPI(generics.CreateAPIView):
+#     serializer_class = reservedSessionSerializer
+#     permission_classes = [permissions.IsAuthenticated]

@@ -194,12 +194,16 @@ class RequestSerializer(serializers.Serializer):
 class CreateRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
-        fields = ['request_content', 'receiver']
+        fields = ['request_content', 'reservation_datetime', 'duration_min', 'receiver']
+        
 
     def create(self, validated_data):
         return Request.objects.create(request_content=validated_data['request_content'],
                                       receiver_id=validated_data['receiver'].id,
-                                      sender_id=self.context['request'].user.id)
+                                      sender_id=self.context['request'].user.id,
+                                      reservation_datetime=validated_data['reservation_datetime'],
+                                      duration_min=validated_data['duration_min'],
+                                      end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
 
 
 class CreateInvitationSerializer(serializers.ModelSerializer):
@@ -276,11 +280,39 @@ class AdvisorResumeSerializer(serializers.ModelSerializer):
 
 
 class RequestUpdateSerializer(serializers.ModelSerializer):
+    reservation_datetime = serializers.DateTimeField()
+    duration_min = serializers.IntegerField()
     class Meta:
         model = Request
-        fields = ['is_checked', 'is_accepted', 'is_blocked', 'sender']
+        fields = ['is_checked', 'is_accepted', 'is_blocked', 'sender', 'receiver', 'duration_min', 'reservation_datetime']
         read_only_fields = ['sender']
 
+    def update(self, instance, validated_data):
+        instance = super(RequestUpdateSerializer, self).update(instance, validated_data)
+        if(instance.is_accepted == True):
+            chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver'].id) + str(secrets.token_urlsafe(20)))
+            Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
+            Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'].id)
+            Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'].id, 
+                reservation_datetime=validated_data['reservation_datetime'],
+                end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
+            return instance
+        elif(instance.is_blocked == True):
+            return instance
+        return instance
+
+
+    # def update(self, instance, validated_data):
+    #     password = validated_data.get('password')
+
+    #     if password is not None:
+    #         super(UserSerializer, self).update(instance, validated_data)
+    #         instance.password = make_password(validated_data.get('password', instance.password))
+    #         instance.save()
+    #     else:
+    #         super(UserSerializer, self).update(instance, validated_data)
+
+    #     return instance
 
 class professionFinder(serializers.Serializer):
     profession = serializers.CharField()
@@ -343,17 +375,18 @@ class UserVerificationSerializer(serializers.ModelSerializer):
 
 class ReservationSerializer(serializers.ModelSerializer):
     duration_min = serializers.IntegerField(write_only=True)
+    receiver = serializers.CharField()
     class Meta:
         model = Reservation
-        fields = [ 'advisor_user', 'reservation_datetime', 'duration_min']
+        fields = [ 'receiver', 'reservation_datetime', 'duration_min']
         
 
     def create(self, validated_data):
         
-        chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['advisor_user'].id) + str(secrets.token_urlsafe(20)))
+        chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver'].id) + str(secrets.token_urlsafe(20)))
         Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
-        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['advisor_user'].id)
-        return Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['advisor_user'].id, 
+        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'].id)
+        return Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'].id, 
                 reservation_datetime=validated_data['reservation_datetime'],
                 end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
 

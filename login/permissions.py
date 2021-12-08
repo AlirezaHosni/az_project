@@ -43,6 +43,24 @@ class IsChatDone(permissions.BasePermission):
         return True
 
 
+# class IsChatFinishedByAdvisor(permissions.BasePermission):
+#     message = "در حال حاضر مشاور در حال مشاوره دادن هست.ابتدا آن جلسه باید به اتمام برسد"
+#     def has_permission(self, request, view):
+#         serialized_data = ReservationSerializer(data=request.data)
+#         serialized_data.is_valid(raise_exception=True)
+#         reservation_datetime = serialized_data.validated_data['reservation_datetime']
+#         end_session_datetime = reservation_datetime + timedelta(minutes=serialized_data.validated_data['duration_min'])
+#         advisor_user_id = serialized_data.validated_data['receiver']
+#         #print(advisor_user_id)
+#         record_count = Reservation.objects.raw("select id, COUNT(*) as num_row from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s)",
+#          [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime, advisor_user_id])
+
+#         for n in record_count:
+#             if n.num_row > 0:
+#                 return False
+
+#         return True
+
 class IsNotConfirmed(permissions.BasePermission):
     message="این نظر قبلا تایید شده است و امکان ویرایش نیست"
     def has_permission(self, request, view):
@@ -68,19 +86,19 @@ class CanBeActive(permissions.BasePermission):
 
 
 class CanReserveDatetime(permissions.BasePermission):
-    message = "این بازه زمانی قبلا رزرو شده است!"
+    message = "این بازه زمانی قبلا رزرو شده است یا هم اکنون مشاور مشغول جلسه دیگری هست"
     def has_permission(self, request, view):
         serialized_data = ReservationSerializer(data=request.data)
         serialized_data.is_valid(raise_exception=True)
         reservation_datetime = serialized_data.validated_data['reservation_datetime']
         end_session_datetime = reservation_datetime + timedelta(minutes=serialized_data.validated_data['duration_min'])
-        advisor_user_id = serialized_data.validated_data['advisor_user'].id
-        print(advisor_user_id)
-        record_count = Reservation.objects.raw("select id, COUNT(*) as num_row from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s)",
+        advisor_user_id = serialized_data.validated_data['receiver']
+        #print(advisor_user_id)
+        record_count = Reservation.objects.raw("select id, is_done from chat_chat_user where user_id in (select user_id from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s))",
          [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime, advisor_user_id])
 
         for n in record_count:
-            if n.num_row > 0:
+            if n.is_done == False:
                 return False
 
         return True

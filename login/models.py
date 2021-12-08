@@ -59,6 +59,10 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     image = models.ImageField(null=True, blank=True, upload_to="images/")
+    status = models.CharField(max_length=7, default='offline', choices=(
+            ('offline', 'offline'),
+            ('online', 'online'))
+            )
     # for using ImageField you should run this command from the cmd:
     #  pip install pillow
     objects = Manager()
@@ -103,7 +107,10 @@ class Request(models.Model):
     is_blocked = models.BooleanField(null=True)
     is_accepted = models.BooleanField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_Done = models.BooleanField(default=False)
+    reservation_datetime = models.DateTimeField()
+    duration_min = models.IntegerField()
+    end_session_datetime = models.DateTimeField()
+
 
 
 class Invitation(models.Model):
