@@ -9,5 +9,5 @@ urlpatterns = [
     path('send-message/<int:id>/',CreateMessageAPI.as_view()),
     path('<int:id>/',ListMessageAPI.as_view(),name='createListMessages'),
     
-    path('update-chat-status/<int:user_id>/',UpdateChatStatus.as_view()),#it must call two times in a row because of updating to records in chat_user
+    path('update-chat-status/<int:chat_id>/',UpdateChatStatus.as_view()),
 ]

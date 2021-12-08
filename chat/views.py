@@ -2,7 +2,9 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
 from .serializers import CreateChatSerializer, MessageSerializer,ChatListSerializer, ChatUserSerializer
 from .permissions import IsAdvisor, IsChatGetStarted, IsChatDone, IsChatFinishedAccordingToTime
 from .models import Message,Chat_User,Chat
@@ -37,9 +39,9 @@ class CreateMessageAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsChatGetStarted, IsChatDone, IsChatFinishedAccordingToTime]
 
 
-class UpdateChatStatus(generics.UpdateAPIView):
-    serializer_class = ChatUserSerializer
-    permission_classes = [IsAuthenticated, IsAdvisor]
+class UpdateChatStatus(APIView):
+    permission_classes = [IsAuthenticated, IsAdvisor ]
+    def put(self, request, *args, **kwargs):
+        Chat_User.objects.filter(chat= self.kwargs['chat_id']).update(is_done=True)
 
-    def get_object(self):
-        return Chat_User.objects.get(user=self.kwargs['user_id'])
+        return Response(status.HTTP_200_OK)
