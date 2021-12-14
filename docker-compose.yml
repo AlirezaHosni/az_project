@@ -12,6 +12,7 @@ services:
       - .env.prod
     networks:
       - mysql-network
+      - redis-network
     external_links:
       - mysql
     volumes:
@@ -21,4 +22,6 @@ services:
 
 networks:
   mysql-network:
+    external: true
+  redis-network:
     external: true
