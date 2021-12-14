@@ -39,6 +39,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -97,7 +98,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
         "NAME": os.environ.get("SQL_DATABASE", "moshaver_db"),
         "USER": os.environ.get("SQL_USER", "root"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "fire.NICK0"),
         "HOST": os.environ.get("SQL_HOST", "127.0.0.1"),
     }
 }
@@ -199,3 +200,14 @@ EMAIT_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ostadmoshaverteam@gmail.com'
 EMAIL_HOST_PASSWORD = 'moshaver1400'
+
+
+ASGI_APPLICATION = "Moshaver.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
