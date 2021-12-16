@@ -45,7 +45,7 @@ class SignUpAPI(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         confirmation_token = Email_Verification.objects.get(user_id=UserSerializer(user).data["id"]).key
-        print(confirmation_token)
+        #print(confirmation_token)
         #print(UserSerializer(user).data['id'])
         #token = Token.objects.get(user).key
         activate_link_url = "https://moshaver.markop.ir/"
@@ -93,7 +93,7 @@ class LoginAPI(KnoxLoginView):
 
 
 class Logout(APIView):
-    def get(self, request, format=None):
+    def post(self, request, format=None):
         # simply delete the token to force a login
         request.user.status = 'offline'
         request.user.save()
