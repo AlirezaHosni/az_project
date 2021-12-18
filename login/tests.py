@@ -194,7 +194,7 @@ class RegisterTestCase(APITestCase):
         self.assertEqual(user_as_advisor_response.status_code, status.HTTP_200_OK)
 
     def test_user_can_logout(self):
-        response = self.client.get('/api/logout/')
+        response = self.client.post('/api/logout/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
