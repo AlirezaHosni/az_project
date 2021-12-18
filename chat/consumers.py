@@ -2,7 +2,6 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import AnonymousUser
 from chat.models import Chat_User, Message, Chat
 from login.models import User
 from rest_framework.authtoken.models import Token
@@ -62,7 +61,7 @@ class Send_Message(WebsocketConsumer):
     }
 
     def connect(self):
-        self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+        self.chat_id = int(self.scope['url_route']['kwargs']['chat_id'])
         self.room_group_name = Chat.objects.get(pk=self.chat_id).title
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -78,7 +77,9 @@ class Send_Message(WebsocketConsumer):
                     self.accept()
                     break
         except(Token.DoesNotExist):
-            return AnonymousUser()
+            return {
+                "error": "این کاربر ناشناخته هست. ابتدا  وارد سایت شوید"
+            }
         
         
 
