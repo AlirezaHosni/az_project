@@ -50,16 +50,19 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 import chat.routing
+from django.urls import path
+from chat.consumers import Send_Message
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Moshaver.settings")
 
 application = ProtocolTypeRouter({
   "http": get_asgi_application(),
-  "websocket": AuthMiddlewareStack(
-        URLRouter(
-            chat.routing.websocket_urlpatterns
-        )
-    ),
+  "websocket": 
+        URLRouter([
+            path('ws/chat/<int:chat_id>/', Send_Message.as_asgi())
+        ]),
+    
 })
 
 
