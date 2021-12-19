@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+bik9$*c=$q1xc^u6+lr^s8s!#b!ct1==*uh6=d_-&+q2b$(k#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # A list of strings representing the host/domain names that this Django site can serve.
 ALLOWED_HOSTS = ['*']
@@ -98,7 +98,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
         "NAME": os.environ.get("SQL_DATABASE", "moshaver_db"),
         "USER": os.environ.get("SQL_USER", "root"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "fire.NICK0"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
         "HOST": os.environ.get("SQL_HOST", "127.0.0.1"),
     }
 }
