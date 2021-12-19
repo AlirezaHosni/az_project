@@ -7,7 +7,7 @@ services:
     container_name: moshaver-api
     restart: always
     ports:
-      - 127.0.0.1:6005:8000
+      - 6005:8000
     env_file:
       - .env.prod
     networks:
