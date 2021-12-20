@@ -53,16 +53,16 @@ class SignUpAPI(APIView):
         # send an e-mail to the user
         context = "لطفا برای فعالسازی حساب خود به لینک زیر مراجعه کنید" + '\n' + str(actiavation_link)
 
-        send_mail(
-            # title:
-            "فعالسازی حساب کاربری در مشاوره آنلاین",
-            # message:
-            context,
-            # from:
-            "ostadmoshaverteam@gmail.com",
-            # to:
-            [UserSerializer(user).data["email"]]
-        )
+        # send_mail(
+        #     # title:
+        #     "فعالسازی حساب کاربری در مشاوره آنلاین",
+        #     # message:
+        #     context,
+        #     # from:
+        #     "ostadmoshaverteam@gmail.com",
+        #     # to:
+        #     [UserSerializer(user).data["email"]]
+        # )
 
         return Response({
             # "user": UserSerializer(user).data,
