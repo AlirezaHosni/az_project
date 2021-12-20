@@ -70,7 +70,7 @@ class Send_Message(WebsocketConsumer):
         try:
             
             for header in self.scope["headers"]:
-                
+                print(header)
                 if str(header[0]) == "b'authorization'":
                     self.user_id = Token.objects.get(key=str(header[1])[8:-1]).user_id
                     self.update_user_status(self.user_id, 'online')
