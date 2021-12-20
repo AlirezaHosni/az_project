@@ -68,14 +68,10 @@ class Send_Message(WebsocketConsumer):
             self.channel_name
         )
         try:
-            
-            for header in self.scope["headers"]:
-                print(header)
-                if str(header[0]) == "b'authorization'":
-                    self.user_id = Token.objects.get(key=str(header[1])[8:-1]).user_id
-                    self.update_user_status(self.user_id, 'online')
-                    self.accept()
-                    break
+            token = self.scope['url_route']['kwargs']['token']
+            self.user_id = Token.objects.get(key=token).user_id
+            self.update_user_status(self.user_id, 'online')    
+            self.accept()
         except(Token.DoesNotExist):
             return {
                 "error": "این کاربر ناشناخته هست. ابتدا  وارد سایت شوید"
