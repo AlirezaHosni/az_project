@@ -25,6 +25,10 @@ class Send_Message(WebsocketConsumer):
             user_id=user_contact,
             chat_id=self.scope['url_route']['kwargs']['chat_id'],
             text=data['text'])
+            print(message.text)
+            print(message.text)
+            print(message.text)
+            print(message.text)
         else:
             return {
                 "error": "امکان ارسال پیام وجود ندارد"
@@ -46,6 +50,11 @@ class Send_Message(WebsocketConsumer):
         return result
 
     def message_to_json(self, message):
+        print(message.text)
+        print(message.text)
+        print(message.text)
+        print(message.text)
+        print(message.text)
         return {
             'id': message.id,
             'text': message.text,
@@ -91,6 +100,7 @@ class Send_Message(WebsocketConsumer):
         self.commands[data['command']](self, data)
 
     def send_chat_message(self, message):
+        
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
