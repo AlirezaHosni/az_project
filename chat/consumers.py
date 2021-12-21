@@ -29,10 +29,7 @@ class Send_Message(WebsocketConsumer):
             print(message.text)
             print(message.text)
             print(message.text)
-        else:
-            return {
-                "error": "امکان ارسال پیام وجود ندارد"
-            }
+        
 
         # current_chat = get_current_chat(data['chatId'])
         # current_chat.messages.add(message)
@@ -41,6 +38,8 @@ class Send_Message(WebsocketConsumer):
             'command': 'new_message',
             'message': self.message_to_json(message)
         }
+        print(message.text + " " + message.text)
+
         return self.send_chat_message(content)
 
     def messages_to_json(self, messages):
