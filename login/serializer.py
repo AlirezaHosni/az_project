@@ -356,13 +356,21 @@ class AdvisorDocSerializer(serializers.ModelSerializer):
 
 
 
+class reservedSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = ['user', 'advisor_user', 'reservation_datetime', 'end_session_datetime']
+
+
+
 class ListNotifiactionSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(read_only=True)
     contacts = UserSerializer(read_only=True, many=True)
+    reservation = reservedSessionSerializer(read_only=True)
     class Meta:
         model = Notifiaction
-        fields = fields = ['user', 'type', 'contacts', 'created_at']
+        fields = ['user', 'type', 'contacts', 'created_at', 'reservation']
 
 
 
@@ -408,7 +416,3 @@ class ReservationSerializer(serializers.ModelSerializer):
     #     return instance
 
 
-class reservedSessionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Reservation
-        fields = ['advisor_user', 'reservation_datetime', 'end_session_datetime']

@@ -402,7 +402,7 @@ class ListReservedDateTimeForParticularAdvisor(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Reservation.objects.raw("select id, advisor_user_id, reservation_datetime, end_session_datetime from login_reservation where DATE('reservation_datetime') >= CURDATE()")
+        return Reservation.objects.raw("select id, advisor_user_id, user_id, reservation_datetime, end_session_datetime from login_reservation where DATE('reservation_datetime') >= CURDATE()")
 
 
 # class InMomentReservationAPI(generics.CreateAPIView):
