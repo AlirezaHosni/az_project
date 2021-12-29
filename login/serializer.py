@@ -6,7 +6,7 @@ from knox import models
 from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.generics import get_object_or_404
-from .models import Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
+from .models import Notifiaction, Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
 from chat.models import Chat_User, Chat
 from django.contrib.auth.hashers import make_password
 import secrets
@@ -374,22 +374,38 @@ class UserVerificationSerializer(serializers.ModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    duration_min = serializers.IntegerField(write_only=True)
+    duration_min = serializers.IntegerField()
     receiver = serializers.CharField()
     class Meta:
         model = Reservation
-        fields = [ 'receiver', 'reservation_datetime', 'duration_min']
+        fields = ['receiver', 'reservation_datetime', 'duration_min']
         
 
     def create(self, validated_data):
-        
-        chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver'].id) + str(secrets.token_urlsafe(20)))
-        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
-        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'].id)
-        return Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'].id, 
-                reservation_datetime=validated_data['reservation_datetime'],
-                end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
 
+        chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver']) + str(secrets.token_urlsafe(20)))
+        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
+        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'])
+        reservation = Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'], 
+            reservation_datetime=validated_data['reservation_datetime'],
+            end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
+            
+        Notifiaction.objects.create(type='r', user_id=validated_data['receiver'], reservation_id=reservation.id)
+        Notifiaction.objects.create(type='r', user_id=self.context['request'].user.id, reservation_id=reservation.id)
+        return validated_data
+    # def update(self, instance, validated_data):
+    #     instance = super(RequestUpdateSerializer, self).update(instance, validated_data)
+    #     if(instance.is_accepted == True):
+    #         chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver'].id) + str(secrets.token_urlsafe(20)))
+    #         Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
+    #         Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'].id)
+    #         Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'].id, 
+    #             reservation_datetime=validated_data['reservation_datetime'],
+    #             end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
+    #         return instance
+    #     elif(instance.is_blocked == True):
+    #         return instance
+    #     return instance
 
 
 class reservedSessionSerializer(serializers.ModelSerializer):

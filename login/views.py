@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
-from .models import Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
+from .models import Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
 from .serializer import reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
@@ -386,8 +386,15 @@ class ListCreateReservation(generics.ListCreateAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated, CanReserveDatetime]
 
-    def get_queryset(self):
-        return None
+    # def get_queryset(self):
+    #     return None
+
+# class RequestUpdateStatus(generics.UpdateAPIView):
+#     serializer_class = RequestUpdateSerializer
+#     permission_classes = (permissions.IsAuthenticated, CanReserveDatetime,)
+
+#     def get_object(self):
+#         return Request.objects.get(id=self.kwargs['id'])
 
 
 class ListReservedDateTimeForParticularAdvisor(generics.ListAPIView):

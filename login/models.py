@@ -96,6 +96,8 @@ class Advisor(models.Model):
         address = models.CharField("advisor address", max_length=300, null=True)
         telephone = models.CharField(max_length=11, null=True)
         is_verified = models.BooleanField(default=False, null=True)
+        daily_begin_time = models.TimeField(null=True)
+        daily_end_time = models.TimeField(null=True)
         objects = models.Manager()
 
 
@@ -154,6 +156,7 @@ class Notifiaction(models.Model):
     contacts = models.ManyToManyField("User", related_name='contacts')
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    reservation = models.ForeignKey("Reservation", on_delete=models.CASCADE)
 
 class Email_Verification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
