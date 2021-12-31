@@ -130,7 +130,7 @@ class RegisterSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
-    doc_images = serializers.ListField(child=ImageField(), allow_empty=True)
+    doc_images = serializers.ListField(child=serializers.ImageField(), allow_empty=True)
 
 
     def create(self, validated_data):
@@ -471,5 +471,18 @@ class ReservationSerializer(serializers.ModelSerializer):
     #     elif(instance.is_blocked == True):
     #         return instance
     #     return instance
+class UploadSerializer(serializers.ModelSerializer):
+    doc_image = serializers.ListField(child=serializers.ImageField())
+    class Meta:
+        model = Advisor_Document
+        fields = ['advisor', 'doc_image']
 
+    def create(self, validated_data):
+
+        for image in validated_data['doc_image']:
+                Advisor_Document.objects.create(advisor_id=validated_data['advisor'].id,
+                                                doc_image=image
+                                                )
+
+        return validated_data
 
