@@ -38,7 +38,7 @@ from rest_framework.authtoken.models import Token
 #   pip install drf-spectacular
 
 
-class SignUpAPI(generics.CreateAPIView):
+class SignUpAPI(APIView):
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
