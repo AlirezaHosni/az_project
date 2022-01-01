@@ -130,7 +130,7 @@ class RegisterSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
-    doc_images = serializers.ImageField()
+    doc_images = serializers.ListField(child=serializers.ImageField(), allow_empty=True)
 
 
     def create(self, validated_data):
@@ -179,13 +179,13 @@ class RegisterSerializer(serializers.Serializer):
                                              address=validated_data['address'],
                                              telephone=validated_data['telephone'])
                                              
-            # for image in validated_data['doc_images']:
-            #     Advisor_Document.objects.create(advisor_id=advisor.id,
-            #                                     doc_image=image
-            #                                     )
-            Advisor_Document.objects.create(advisor_id=advisor.id,
-                                                    doc_image=validated_data['doc_images']
-                                                    )
+            for image in validated_data['doc_images']:
+                Advisor_Document.objects.create(advisor_id=advisor.id,
+                                                doc_image=image
+                                                )
+            # Advisor_Document.objects.create(advisor_id=advisor.id,
+            #                                         doc_image=validated_data['doc_images']
+            #                                         )
         return user
 
 
