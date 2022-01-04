@@ -122,11 +122,11 @@ class RegisterTestCase(APITestCase):
         # img = open('C:/Users/AmirHossein/Pictures/Screenshots/Screenshot (3).png', encoding="utf8")
         # img = SimpleUploadedFile("C:/Users/AmirHossein/Pictures/Screenshots/Screenshot (3).png", b"file_content")
 
-        file = io.BytesIO(b'C:/Users/AmirHossein/Pictures/Screenshots/Screenshot (3).png')
-        image = Image.new('RGBA', size=(100, 100), color=(155, 0, 0))
-        image.save(file, 'png')
-        file.name = 'test.png'
-        file.seek(0)
+        # file = io.BytesIO(b'C:/Users/AmirHossein/Pictures/Screenshots/Screenshot (3).png')
+        # image = Image.new('RGBA', size=(100, 100), color=(155, 0, 0))
+        # image.save(file, 'png')
+        # file.name = 'test.png'
+        # file.seek(0)
         
 
         data = {
@@ -147,7 +147,7 @@ class RegisterTestCase(APITestCase):
                 "advise_method": "on",
                 "address": "shkfjsdkj",
                 "telephone": "64387958",
-                "doc_images": [file]
+                # "doc_images": [file]
             }
         response = self.client.post('/api/signup/', data)
         
