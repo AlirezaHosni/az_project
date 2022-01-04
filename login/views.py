@@ -33,6 +33,8 @@ from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
 # run this command for knox
 #   pip install django-rest-knox
 #   pip install drf-spectacular
@@ -409,6 +411,36 @@ class ListReservedDateTimeForParticularAdvisor(generics.ListAPIView):
 #     serializer_class = reservedSessionSerializer
 #     permission_classes = [permissions.IsAuthenticated]
 
-class Upload(generics.CreateAPIView):
+# class Upload(generics.CreateAPIView):
+#     serializer_class = UploadSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+class UploadDocFile(generics.ListCreateAPIView):
     serializer_class = UploadSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Advisor_Document.objects.filter(advisor_id=self.kwargs['advisor_id'])
+
+
+class DownloadFileImage(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
+        document = open("media/" + str(file_path), 'rb')
+        response = HttpResponse(FileWrapper(document), content_type='image/png')
+        return response
+
+class DownloadFilePDF(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
+        document = open("media/" + str(file_path), 'rb')
+        response = HttpResponse(FileWrapper(document), content_type='application/pdf')
+        return response
+
+class DeleteUploadedFile(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get_object(self):
+        return Advisor_Document.objects.get(id=self.kwargs['file_id'])
+

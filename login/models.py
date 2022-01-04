@@ -139,7 +139,7 @@ class Advisor_History(models.Model):
 
 class Advisor_Document(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    doc_image = models.ImageField(null=True, blank=True, upload_to="Documents/")
+    doc_file = models.FileField(null=True, blank=True, upload_to="Documents/")
     confirmed_at = models.DateTimeField(null=True, blank=True)
     advisor = models.ForeignKey("Advisor", on_delete=models.CASCADE, related_name='advisor')
 

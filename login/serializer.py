@@ -130,7 +130,7 @@ class RegisterSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
-    doc_images = serializers.ListField(child=serializers.ImageField(), allow_empty=True)
+    # doc_files = serializers.FileField()
 
 
     def create(self, validated_data):
@@ -179,13 +179,20 @@ class RegisterSerializer(serializers.Serializer):
                                              address=validated_data['address'],
                                              telephone=validated_data['telephone'])
                                              
-            for image in validated_data['doc_images']:
-                Advisor_Document.objects.create(advisor_id=advisor.id,
-                                                doc_image=image
-                                                )
-            # Advisor_Document.objects.create(advisor_id=advisor.id,
-            #                                         doc_image=validated_data['doc_images']
+            # if hasattr(validated_data, 'doc_images'):
+            #     for image in validated_data['doc_images']:
+            #         Advisor_Document.objects.create(advisor_id=advisor.id,
+            #                                         doc_image=image
             #                                         )
+            # try:
+            #     validated_data['doc_images']
+            # except NameError:
+            #     print("well, docImage WASN'T defined after all!")
+            # else:
+            # if hasattr(validated_data, 'doc_files'):
+            # Advisor_Document.objects.create(advisor_id=advisor.id,
+            #                                             doc_image=validated_data['doc_files']
+            #                                             )
         return user
 
 
@@ -476,7 +483,15 @@ class ReservationSerializer(serializers.ModelSerializer):
 class UploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
-        fields = ['advisor', 'doc_image']
+        fields = ['id', 'advisor_id', 'doc_file', 'confirmed_at']
+
+    def create(self, validated_data):
+        for file in validated_data['doc_file']:
+            Advisor_Document.objects.create(
+                advisor=validated_data['advisor_id'],
+                doc_file=file
+            )
+        return validated_data
 
 
 
