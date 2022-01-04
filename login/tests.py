@@ -52,7 +52,7 @@ class RegisterTestCase(APITestCase):
             user_id = self.user2.id
         )
         self.advisor_doc = Advisor_Document.objects.create(
-            doc_image = "Documents/Screenshot_283_HC31hdt.png",
+            doc_file = "Documents/Screenshot_283_HC31hdt.png",
             advisor_id = self.advisor.id
         )
         self.chat_intime = Chat.objects.create(
@@ -146,7 +146,7 @@ class RegisterTestCase(APITestCase):
                 "meli_code": "4090084",
                 "advise_method": "on",
                 "address": "shkfjsdkj",
-                "telephone": "64387958",
+                "telephone": "64387958"
                 # "doc_images": [file]
             }
         response = self.client.post('/api/signup/', data)
@@ -249,7 +249,7 @@ class AdvisorStuffTestCase(APITestCase):
             user_id = self.user.id
         )
         self.advisor_doc = Advisor_Document.objects.create(
-            doc_image = "Documents/Screenshot_283_HC31hdt.png",
+            doc_file = "Documents/Screenshot_283_HC31hdt.png",
             advisor_id = self.advisor.id
         )
         self.advisor_resume = Advisor_History.objects.create(
