@@ -424,10 +424,9 @@ class UploadDocFile(generics.ListCreateAPIView):
 
 
 class DownloadFileImage(APIView):
-    permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
         file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
-        if str(file_path)[-3:] == "pdf":
+        if str(file_path)[-3:] == "pdf" or str(file_path)[-3:] == "PDF":
             document = open("media/" + str(file_path), 'rb')
             response = HttpResponse(FileWrapper(document), content_type='application/pdf')
             return response
@@ -438,7 +437,6 @@ class DownloadFileImage(APIView):
         return None
 
 class DownloadFilePDF(APIView):
-    permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
         file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
         document = open("media/" + str(file_path), 'rb')
