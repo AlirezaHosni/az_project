@@ -506,7 +506,7 @@ class ListAdvisorInfoForAdminSerializer(serializers.Serializer):
 class UploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
-        fields = ['id', 'confirmed_at']
+        fields = ['confirmed_at']
         
 
 
