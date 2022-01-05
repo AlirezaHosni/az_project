@@ -42,7 +42,7 @@ class Manager(UserManager):
 
 # Create your models here.
 class User(AbstractUser):
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     GENDER = [ ('M','male'),('F','female')]
     username = None
     email = models.EmailField(unique=True, null=True)
