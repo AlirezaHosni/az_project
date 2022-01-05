@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'questionnaire',
     'django_rest_passwordreset',
     'rest_framework.authtoken',
+    'adminPanel'
 ]
 
 MIDDLEWARE = [
