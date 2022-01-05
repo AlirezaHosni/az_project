@@ -484,14 +484,13 @@ class UploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
         fields = ['id', 'advisor_id', 'doc_file', 'confirmed_at']
-        read_only_fields = ['id', 'confirmed_at']
 
     def create(self, validated_data):
-        
-        Advisor_Document.objects.create(
-            advisor_id=self.context['view'].kwargs.get('advisor_id'),
-            doc_file=validated_data['doc_file']
-        )
+        for file in validated_data['doc_file']:
+            Advisor_Document.objects.create(
+                advisor=validated_data['advisor_id'],
+                doc_file=file
+            )
         return validated_data
 
 
