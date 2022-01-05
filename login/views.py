@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
 from .models import Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .serializer import ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -427,9 +427,15 @@ class DownloadFileImage(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
         file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
-        document = open("media/" + str(file_path), 'rb')
-        response = HttpResponse(FileWrapper(document), content_type='image/png')
-        return response
+        if str(file_path)[-3:] == "pdf":
+            document = open("media/" + str(file_path), 'rb')
+            response = HttpResponse(FileWrapper(document), content_type='application/pdf')
+            return response
+        else:
+            document = open("media/" + str(file_path), 'rb')
+            response = HttpResponse(FileWrapper(document), content_type='image/png')
+            return response
+        return None
 
 class DownloadFilePDF(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -444,3 +450,18 @@ class DeleteUploadedFile(generics.DestroyAPIView):
     def get_object(self):
         return Advisor_Document.objects.get(id=self.kwargs['file_id'])
 
+class ListAdvisorInfoForAdmin(generics.ListAPIView):
+    serializer_class = ListAdvisorInfoForAdminSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_queryset(self):
+        return User.objects.raw("SELECT login_user.id, image, first_name, last_name, doc_file FROM login_user inner JOIN (SELECT user_id, doc_file from login_advisor inner JOIN login_advisor_document on login_advisor_document.advisor_id = login_advisor.id) as res on res.user_id = login_user.id ORDER BY id")
+
+
+class UpdateDocFileStatus(generics.UpdateAPIView):
+    serializer_class = UploadSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_queryset(self):
+        return Advisor_Document.objects.get(id=self.kwargs['file_id'])  #it needs a boolean to compare accepted or denied.
+        

@@ -494,4 +494,11 @@ class UploadSerializer(serializers.ModelSerializer):
         return validated_data
 
 
+class ListAdvisorInfoForAdminSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    image = serializers.ImageField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    doc_file = serializers.FileField()
+
 
