@@ -503,7 +503,7 @@ class ListAdvisorInfoForAdminSerializer(serializers.Serializer):
     doc_file = serializers.FileField()
 
 
-class UploadSerializer(serializers.ModelSerializer):
+class UpdateFileStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
         fields = ['confirmed_at']

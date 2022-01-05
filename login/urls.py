@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import  ListAdvisorInfoForAdmin, DownloadFilePDF, DeleteUploadedFile, DownloadFileImage, UploadDocFile, LoginUserAPI, ListReservedDateTimeForParticularAdvisor, ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
+from .views import  UpdateDocFileStatus, ListAdvisorInfoForAdmin, DownloadFilePDF, DeleteUploadedFile, DownloadFileImage, UploadDocFile, LoginUserAPI, ListReservedDateTimeForParticularAdvisor, ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
 from knox import views as knox_views
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -42,7 +42,7 @@ urlpatterns = [
     path('delete-uploaded-file/<file_id>/', DeleteUploadedFile.as_view()),
     
     path('list-advisor-info-for-admin/', ListAdvisorInfoForAdmin.as_view()),
-    path('update-doc-file-status/<file_id>/', ListAdvisorInfoForAdmin.as_view()),
+    path('update-doc-file-status/<file_id>/', UpdateDocFileStatus.as_view()),
 
 
 ]
