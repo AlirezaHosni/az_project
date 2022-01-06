@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
 from .models import Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .serializer import UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -460,9 +460,9 @@ class ListAdvisorInfoForAdmin(generics.ListAPIView):
 
 
 class UpdateDocFileStatus(generics.UpdateAPIView):
-    serializer_class = UploadSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    serializer_class = UpdateFileStatusSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
+    def get_object(self):
         return Advisor_Document.objects.get(id=self.kwargs['file_id'])  #it needs a boolean to compare accepted or denied.
         

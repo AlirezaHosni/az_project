@@ -484,13 +484,14 @@ class UploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
         fields = ['id', 'advisor_id', 'doc_file', 'confirmed_at']
+        read_only_fields = ['id', 'confirmed_at', 'advisor_id']
 
     def create(self, validated_data):
-        for file in validated_data['doc_file']:
-            Advisor_Document.objects.create(
-                advisor=validated_data['advisor_id'],
-                doc_file=file
-            )
+        
+        Advisor_Document.objects.create(
+            advisor_id=self.context['view'].kwargs.get('advisor_id'),
+            doc_file=validated_data['doc_file']
+        )
         return validated_data
 
 
@@ -500,5 +501,13 @@ class ListAdvisorInfoForAdminSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     doc_file = serializers.FileField()
+
+
+class UpdateFileStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advisor_Document
+        fields = ['confirmed_at']
+        
+
 
 
