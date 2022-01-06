@@ -63,6 +63,7 @@ class User(AbstractUser):
             ('offline', 'offline'),
             ('online', 'online'))
             )
+    wallet = models.IntegerField(default=0)
     # for using ImageField you should run this command from the cmd:
     #  pip install pillow
     objects = Manager()
