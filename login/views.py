@@ -513,6 +513,15 @@ class ListAnalyticalData(APIView):
 
         data_reserved_session = User.objects.raw("SELECT id, COUNT(id) as reserved from login_reservation")
 
+        data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation")
+        records_result = []
+        sum_of_serssion_hours = 0
+        for rec in data_reservation_datetime:
+            records_result.append(int(rec.end_session_datetime.hour - rec.reservation_datetime.hour))
+        for i in records_result:
+            sum_of_serssion_hours += i
+
+
         return Response({
             "man_percentage": man_percentage,
             "woman_percentage": woman_percentage,
@@ -520,5 +529,6 @@ class ListAnalyticalData(APIView):
             "monthly_view":data_monthly_view[0].num,
             "yearly_view":data_yearly_view[0].num,
             "completed_session": data_completed_session[0].completed_sessions,
-            "reserved_session": data_reserved_session[0].reserved
+            "reserved_session": data_reserved_session[0].reserved,
+            "session_hours":int(sum_of_serssion_hours)
         })
