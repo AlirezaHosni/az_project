@@ -104,15 +104,11 @@ class Advisor(models.Model):
 
 class Request(models.Model):
     receiver = models.ForeignKey("Advisor",  models.CASCADE)
-    sender = models.ForeignKey("User" , models.CASCADE)
+    sender = models.ForeignKey("User", models.CASCADE)
     request_content = models.TextField(null=True)
     is_checked = models.BooleanField(default=False)
-    is_blocked = models.BooleanField(null=True)
     is_accepted = models.BooleanField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    reservation_datetime = models.DateTimeField()
-    duration_min = models.IntegerField()
-    end_session_datetime = models.DateTimeField()
 
 
 
@@ -158,6 +154,7 @@ class Notifiaction(models.Model):
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     reservation = models.ForeignKey("Reservation", on_delete=models.CASCADE)
+
 
 class Email_Verification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

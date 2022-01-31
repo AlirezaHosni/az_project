@@ -52,6 +52,7 @@ from django.core.asgi import get_asgi_application
 import chat.routing
 from django.urls import path
 from chat.consumers import Send_Message
+from login.consumers import RequestConsumer
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Moshaver.settings")
@@ -60,7 +61,9 @@ application = ProtocolTypeRouter({
   "http": get_asgi_application(),
   "websocket": 
         URLRouter([
-            path('ws/chat/<int:chat_id>/<str:token>/', Send_Message.as_asgi())
+            path('ws/chat/<int:chat_id>/<str:token>/', Send_Message.as_asgi()),
+            path('ws/user/request/<str:advisor_id>/<str:request_content>', RequestConsumer.as_asgi()),
+            path('ws/advisor/request/<str:request_id>/<int:answer>', RequestConsumer.as_asgi()),
         ]),
     
 })

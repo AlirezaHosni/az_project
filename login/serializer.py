@@ -7,11 +7,14 @@ from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.fields import ImageField
 from rest_framework.generics import get_object_or_404
-from .models import Notifiaction, Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, Advisor_Document , Invitation, Notifiaction
+from .models import Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, \
+    Advisor_Document, Invitation, Notifiaction
 from chat.models import Chat_User, Chat
 from django.contrib.auth.hashers import make_password
 import secrets
 from datetime import timedelta
+
+
 # from django.utils import timezone
 
 class UserSerializer(serializers.ModelSerializer):
@@ -56,7 +59,6 @@ class AdvisorSerializer(serializers.ModelSerializer):
                                       advise_method=validated_data['advise_method'],
                                       address=validated_data['address'],
                                       telephone=validated_data['telephone'])
-
 
 
 # class Base64ImageField(serializers.ImageField):
@@ -109,8 +111,6 @@ class AdvisorSerializer(serializers.ModelSerializer):
 #         return extension
 
 
-
-
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     first_name = serializers.CharField()
@@ -130,8 +130,8 @@ class RegisterSerializer(serializers.Serializer):
     advise_method = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     telephone = serializers.CharField(allow_null=True)
-    # doc_files = serializers.FileField()
 
+    # doc_files = serializers.FileField()
 
     def create(self, validated_data):
 
@@ -163,9 +163,8 @@ class RegisterSerializer(serializers.Serializer):
 
         email_verification_token = Email_Verification.objects.create(
             user_id=user.id,
-            key = secrets.token_urlsafe(8)
+            key=secrets.token_urlsafe(8)
         )
-
 
         if user.is_advisor == True:
             advisor = Advisor.objects.create(user_id=user.id,
@@ -178,7 +177,7 @@ class RegisterSerializer(serializers.Serializer):
                                              advise_method=validated_data['advise_method'],
                                              address=validated_data['address'],
                                              telephone=validated_data['telephone'])
-                                             
+
             # if hasattr(validated_data, 'doc_images'):
             #     for image in validated_data['doc_images']:
             #         Advisor_Document.objects.create(advisor_id=advisor.id,
@@ -194,7 +193,6 @@ class RegisterSerializer(serializers.Serializer):
             #                                             doc_image=validated_data['doc_files']
             #                                             )
         return user
-
 
     # def validate(self, attrs):
     #     email = attrs.get('email')
@@ -261,19 +259,15 @@ class CreateRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = ['request_content', 'reservation_datetime', 'duration_min', 'receiver']
-        
 
     def create(self, validated_data):
         return Request.objects.create(request_content=validated_data['request_content'],
                                       receiver_id=validated_data['receiver'].id,
                                       sender_id=self.context['request'].user.id,
-                                      reservation_datetime=validated_data['reservation_datetime'],
-                                      duration_min=validated_data['duration_min'],
-                                      end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
+                                      )
 
 
 class CreateInvitationSerializer(serializers.ModelSerializer):
-
     student_id = serializers.IntegerField(write_only=True)
     advisor = UserSerializer(read_only=True)
     student = UserSerializer(read_only=True)
@@ -283,10 +277,9 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
         fields = ['invitation_content', 'advisor', 'student', 'student_id']
 
     def create(self, validated_data):
-        
-        student = get_object_or_404(User,id=validated_data.pop('student_id'))
-        advisor_user = get_object_or_404(User,email=self.context['request'].user.email)
-        advisor = get_object_or_404(Advisor,User=advisor_user)
+        student = get_object_or_404(User, id=validated_data.pop('student_id'))
+        advisor_user = get_object_or_404(User, email=self.context['request'].user.email)
+        advisor = get_object_or_404(Advisor, User=advisor_user)
 
         validated_data['advisor'] = advisor
         validated_data['student'] = student
@@ -299,13 +292,12 @@ class CreateInvitationSerializer(serializers.ModelSerializer):
 
 
 class ListInvitationSerializer(serializers.ModelSerializer):
-
     advisor = AdvisorSerializer(read_only=True)
     student = UserSerializer(read_only=True)
 
     class Meta:
         model = Invitation
-        fields = ['advisor','student','invitation_content','created_at']
+        fields = ['advisor', 'student', 'invitation_content', 'created_at']
 
 
 class RateSerializer(serializers.ModelSerializer):
@@ -329,10 +321,11 @@ class ListRateSerializer(serializers.Serializer):
     image = serializers.ImageField()
     is_confirmed = serializers.BooleanField()
 
+
 class UpdateRateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rate
-        fields ='__all__'
+        fields = '__all__'
 
 
 class AdvisorResumeSerializer(serializers.ModelSerializer):
@@ -348,25 +341,36 @@ class AdvisorResumeSerializer(serializers.ModelSerializer):
 class RequestUpdateSerializer(serializers.ModelSerializer):
     reservation_datetime = serializers.DateTimeField()
     duration_min = serializers.IntegerField()
+
     class Meta:
         model = Request
-        fields = ['is_checked', 'is_accepted', 'is_blocked', 'sender', 'receiver', 'duration_min', 'reservation_datetime']
+        fields = ['is_checked', 'is_accepted', 'is_blocked', 'sender', 'receiver', 'duration_min',
+                  'reservation_datetime']
         read_only_fields = ['sender']
 
     def update(self, instance, validated_data):
         instance = super(RequestUpdateSerializer, self).update(instance, validated_data)
-        if(instance.is_accepted == True):
-            chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver'].id) + str(secrets.token_urlsafe(20)))
-            Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
-            Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'].id)
-            Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'].id, 
-                reservation_datetime=validated_data['reservation_datetime'],
-                end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
+        if (instance.is_accepted == True):
+            chat = Chat.objects.create(
+                title=str(self.context['request'].user.id) + '_' + str(validated_data['receiver'].id) + str(
+                    secrets.token_urlsafe(20)))
+            Chat_User.objects.create(chat_start_datetime=validated_data['reservation_datetime'],
+                                     end_session_datetime=validated_data['reservation_datetime'] + timedelta(
+                                         minutes=validated_data['duration_min']), chat_id=chat.id,
+                                     user_id=self.context['request'].user.id)
+            Chat_User.objects.create(chat_start_datetime=validated_data['reservation_datetime'],
+                                     end_session_datetime=validated_data['reservation_datetime'] + timedelta(
+                                         minutes=validated_data['duration_min']), chat_id=chat.id,
+                                     user_id=validated_data['receiver'].id)
+            Reservation.objects.create(user_id=self.context['request'].user.id,
+                                       advisor_user_id=validated_data['receiver'].id,
+                                       reservation_datetime=validated_data['reservation_datetime'],
+                                       end_session_datetime=validated_data['reservation_datetime'] + timedelta(
+                                           minutes=validated_data['duration_min']))
             return instance
-        elif(instance.is_blocked == True):
+        elif (instance.is_blocked == True):
             return instance
         return instance
-
 
     # def update(self, instance, validated_data):
     #     password = validated_data.get('password')
@@ -379,6 +383,7 @@ class RequestUpdateSerializer(serializers.ModelSerializer):
     #         super(UserSerializer, self).update(instance, validated_data)
 
     #     return instance
+
 
 class professionFinder(serializers.Serializer):
     profession = serializers.CharField()
@@ -417,9 +422,9 @@ class AdvisorDocSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
         def create(self, validated_data):
-            return Advisor_Document.objects.create(advisor_id=Advisor.objects.get(user=self.context['request'].user.id).id,
-                                                doc_image=validated_data['doc_image'])
-
+            return Advisor_Document.objects.create(
+                advisor_id=Advisor.objects.get(user=self.context['request'].user.id).id,
+                doc_image=validated_data['doc_image'])
 
 
 class reservedSessionSerializer(serializers.ModelSerializer):
@@ -428,16 +433,14 @@ class reservedSessionSerializer(serializers.ModelSerializer):
         fields = ['user', 'advisor_user', 'reservation_datetime', 'end_session_datetime']
 
 
-
 class ListNotifiactionSerializer(serializers.ModelSerializer):
-
     user = UserSerializer(read_only=True)
     contacts = UserSerializer(read_only=True, many=True)
     reservation = reservedSessionSerializer(read_only=True)
+
     class Meta:
         model = Notifiaction
         fields = ['user', 'type', 'contacts', 'created_at', 'reservation']
-
 
 
 class UserVerificationSerializer(serializers.ModelSerializer):
@@ -450,20 +453,30 @@ class UserVerificationSerializer(serializers.ModelSerializer):
 class ReservationSerializer(serializers.ModelSerializer):
     duration_min = serializers.IntegerField()
     receiver = serializers.CharField()
+
     class Meta:
         model = Reservation
         fields = ['receiver', 'reservation_datetime', 'duration_min']
-        
 
     def create(self, validated_data):
+        chat = Chat.objects.create(
+            title=str(self.context['request'].user.id) + '_' + str(validated_data['receiver']) + str(
+                secrets.token_urlsafe(20)))
+        Chat_User.objects.create(chat_start_datetime=validated_data['reservation_datetime'],
+                                 end_session_datetime=validated_data['reservation_datetime'] + timedelta(
+                                     minutes=validated_data['duration_min']), chat_id=chat.id,
+                                 user_id=self.context['request'].user.id)
+        Chat_User.objects.create(chat_start_datetime=validated_data['reservation_datetime'],
+                                 end_session_datetime=validated_data['reservation_datetime'] + timedelta(
+                                     minutes=validated_data['duration_min']), chat_id=chat.id,
+                                 user_id=validated_data['receiver'])
+        reservation = Reservation.objects.create(user_id=self.context['request'].user.id,
+                                                 advisor_user_id=validated_data['receiver'],
+                                                 reservation_datetime=validated_data['reservation_datetime'],
+                                                 end_session_datetime=validated_data[
+                                                                          'reservation_datetime'] + timedelta(
+                                                     minutes=validated_data['duration_min']))
 
-        chat = Chat.objects.create(title= str(self.context['request'].user.id) +'_'+ str(validated_data['receiver']) + str(secrets.token_urlsafe(20)))
-        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= self.context['request'].user.id)
-        Chat_User.objects.create(chat_start_datetime= validated_data['reservation_datetime'], end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']) ,chat_id= chat.id,user_id= validated_data['receiver'])
-        reservation = Reservation.objects.create(user_id=self.context['request'].user.id, advisor_user_id=validated_data['receiver'], 
-            reservation_datetime=validated_data['reservation_datetime'],
-            end_session_datetime=validated_data['reservation_datetime'] + timedelta(minutes=validated_data['duration_min']))
-            
         Notifiaction.objects.create(type='r', user_id=validated_data['receiver'], reservation_id=reservation.id)
         Notifiaction.objects.create(type='r', user_id=self.context['request'].user.id, reservation_id=reservation.id)
         return validated_data
@@ -480,6 +493,8 @@ class ReservationSerializer(serializers.ModelSerializer):
     #     elif(instance.is_blocked == True):
     #         return instance
     #     return instance
+
+
 class UploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
@@ -487,7 +502,6 @@ class UploadSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'confirmed_at', 'advisor_id']
 
     def create(self, validated_data):
-        
         Advisor_Document.objects.create(
             advisor_id=self.context['view'].kwargs.get('advisor_id'),
             doc_file=validated_data['doc_file']
@@ -507,7 +521,3 @@ class UpdateFileStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
         fields = ['confirmed_at']
-        
-
-
-
