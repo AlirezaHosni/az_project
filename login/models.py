@@ -42,7 +42,7 @@ class Manager(UserManager):
 
 # Create your models here.
 class User(AbstractUser):
-    email_confirmed_at = models.DateTimeField(null=True)
+    # email_confirmed_at = models.DateTimeField(null=True)
     GENDER = [ ('M','male'),('F','female')]
     username = None
     email = models.EmailField(unique=True, null=True)
