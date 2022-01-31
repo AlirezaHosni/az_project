@@ -463,7 +463,7 @@ class ListAdvisorInfoForAdmin(APIView):
         file_ext = []
         file_ext_each = []
         for user in users:
-            docs.append(User.objects.raw("SELECT login_user.id, image, first_name, last_name, doc_files, doc_file FROM login_user inner JOIN (SELECT user_id, login_advisor_document.id as doc_files, doc_file from login_advisor inner JOIN login_advisor_document on login_advisor_document.advisor_id = login_advisor.id) as res on res.user_id = login_user.id where login_user.id=%s ORDER BY id", [user.id]))
+            docs.append(User.objects.raw("SELECT login_user.id, image, first_name, last_name, doc_files, doc_file, is_verified FROM login_user inner JOIN (SELECT user_id, login_advisor_document.id as doc_files, doc_file, is_verified from login_advisor inner JOIN login_advisor_document on login_advisor_document.advisor_id = login_advisor.id) as res on res.user_id = login_user.id where login_user.id=%s ORDER BY id", [user.id]))
         for u in range(len(users)):
             for user in docs[u]:
                 file_ids.append(user.doc_files)
@@ -482,7 +482,8 @@ class ListAdvisorInfoForAdmin(APIView):
                     "first_name": docs[i][0].first_name,
                     "last_name": docs[i][0].last_name,
                     "doc_files": file_ids_each[i],
-                    "doc_files_ext": file_ext_each[i]
+                    "doc_files_ext": file_ext_each[i],
+                    "is_verified":docs[i][0].is_verified
                 }
             )
         #print(response)
@@ -534,3 +535,11 @@ class ListAnalyticalData(APIView):
             "reserved_session": data_reserved_session[0].reserved,
             "session_hours":int(sum_of_serssion_hours)
         })
+
+
+
+class VerifyAdvisor(generics.UpdateAPIView):
+    serializer_class = AdvisorSerializer
+
+    def get_object(self):
+        return Advisor.objects.get(user_id=self.kwargs['user_id'])
