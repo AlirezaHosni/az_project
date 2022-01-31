@@ -3,16 +3,14 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import QuestionnaireSerializer, QuestionSerializer, AnswerSerializer
+from .serializer import QuestionnaireSerializer, QuestionSerializer, AnswerSerializer, Questionnaire_UserSerializer
 # from .permissions import 
 from .models import Questionnaire, Question, Answer
 
 
 class CreateListQuestionnaireAPIView(generics.ListCreateAPIView):
-	
     serializer_class = QuestionnaireSerializer
     permission_classes = [IsAuthenticated]
-
 
 
 class RetrieveUpdateDestroyQuestionnaireAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -26,18 +24,15 @@ class RetrieveUpdateDestroyQuestionnaireAPIView(generics.RetrieveUpdateDestroyAP
         return obj
 
 
-
 class CreateListQuestionAPIView(generics.ListCreateAPIView):
-	
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
 
 
-
-class RetrieveUpdateDestroyQuestionAPIView(generics.RetrieveUpdateDestroyAPIView):
+class RetrieveUpdateDestroyQuestionAPIView(generics.UpdateAPIView):
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['get', 'patch', 'delete']
+    http_method_names = ['put']
 
     def get_object(self):
         obj = get_object_or_404(Question, id=self.kwargs.get('id'))
@@ -45,12 +40,14 @@ class RetrieveUpdateDestroyQuestionAPIView(generics.RetrieveUpdateDestroyAPIView
         return obj
 
 
-
-class CreateListAnswerAPIView(generics.ListCreateAPIView):
-	
-    serializer_class = AnswerSerializer
+class CreateListQuestionnaire_UserAPIView(generics.ListCreateAPIView):
+    serializer_class = Questionnaire_UserSerializer
     permission_classes = [IsAuthenticated]
 
+
+class CreateListAnswerAPIView(generics.ListCreateAPIView):
+    serializer_class = AnswerSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class RetrieveUpdateDestroyAnswerAPIView(generics.RetrieveUpdateDestroyAPIView):
