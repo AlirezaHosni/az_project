@@ -451,12 +451,41 @@ class DeleteUploadedFile(generics.DestroyAPIView):
     def get_object(self):
         return Advisor_Document.objects.get(id=self.kwargs['file_id'])
 
-class ListAdvisorInfoForAdmin(generics.ListAPIView):
-    serializer_class = ListAdvisorInfoForAdminSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+class ListAdvisorInfoForAdmin(APIView):
 
-    def get_queryset(self):
-        return User.objects.raw("SELECT login_user.id, image, first_name, last_name, doc_file FROM login_user inner JOIN (SELECT user_id, doc_file from login_advisor inner JOIN login_advisor_document on login_advisor_document.advisor_id = login_advisor.id) as res on res.user_id = login_user.id ORDER BY id")
+    def get(self, request, *args, **kwargs):
+        users = User.objects.raw("SELECT login_user.id, image, first_name, last_name FROM login_user inner JOIN (SELECT user_id from login_advisor inner JOIN login_advisor_document on login_advisor_document.advisor_id = login_advisor.id) as res on res.user_id = login_user.id Group BY id")
+        docs = []
+        file_ids = []
+        file_ids_each = []
+        file_ext = []
+        file_ext_each = []
+        for user in users:
+            docs.append(User.objects.raw("SELECT login_user.id, image, first_name, last_name, doc_files, doc_file FROM login_user inner JOIN (SELECT user_id, login_advisor_document.id as doc_files, doc_file from login_advisor inner JOIN login_advisor_document on login_advisor_document.advisor_id = login_advisor.id) as res on res.user_id = login_user.id where login_user.id=%s ORDER BY id", [user.id]))
+        for u in range(len(users)):
+            for user in docs[u]:
+                file_ids.append(user.doc_files)
+                file_ext.append(str(user.doc_file)[-3:])
+            file_ids_each.append(file_ids)
+            file_ext_each.append(file_ext)
+            file_ext = []
+            file_ids = []
+
+        response =[]
+        for i in range(len(users)):
+            response.append(
+                {
+                    "id": docs[i][0].id,
+                    "image": str(docs[i][0].image),
+                    "first_name": docs[i][0].first_name,
+                    "last_name": docs[i][0].last_name,
+                    "doc_files": file_ids_each[i],
+                    "doc_files_ext": file_ext_each[i]
+                }
+            )
+        #print(response)
+        return Response(response)
+
 
 
 class UpdateDocFileStatus(generics.UpdateAPIView):
@@ -466,3 +495,40 @@ class UpdateDocFileStatus(generics.UpdateAPIView):
     def get_object(self):
         return Advisor_Document.objects.get(id=self.kwargs['file_id'])  #it needs a boolean to compare accepted or denied.
         
+
+class ListAnalyticalData(APIView):
+    def get(self, request, *args, **kwargs):
+        data_gender = User.objects.raw("select id, COUNT(id) as male_then_female from login_user group by gender")
+        man_percentage = (data_gender[0].male_then_female/(data_gender[0].male_then_female + data_gender[1].male_then_female))*100
+        woman_percentage = (data_gender[1].male_then_female/(data_gender[0].male_then_female + data_gender[1].male_then_female))*100
+        # print(man_percentage)
+        # print(woman_percentage)
+        data_daily_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 DAY)")
+        data_monthly_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 MONTH)")
+        data_yearly_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 YEAR)")
+        # print(data_daily_view[0].num)
+        # print(data_monthly_view[0].num)
+        # print(data_yearly_view[0].num)
+        data_completed_session = User.objects.raw("SELECT id, COUNT(id)/2 as completed_sessions from chat_chat_user where CURDATE() >= end_session_datetime")
+
+        data_reserved_session = User.objects.raw("SELECT id, COUNT(id) as reserved from login_reservation")
+
+        data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation")
+        records_result = []
+        sum_of_serssion_hours = 0
+        for rec in data_reservation_datetime:
+            records_result.append(int(rec.end_session_datetime.hour - rec.reservation_datetime.hour))
+        for i in records_result:
+            sum_of_serssion_hours += i
+
+
+        return Response({
+            "man_percentage": man_percentage,
+            "woman_percentage": woman_percentage,
+            "daily_view":data_daily_view[0].num,
+            "monthly_view":data_monthly_view[0].num,
+            "yearly_view":data_yearly_view[0].num,
+            "completed_session": data_completed_session[0].completed_sessions,
+            "reserved_session": data_reserved_session[0].reserved,
+            "session_hours":int(sum_of_serssion_hours)
+        })

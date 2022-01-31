@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('login.urls')),
     path('chat/',include('chat.urls')),
+    path('admin-panel/', include('adminPanel.urls')),
     # YOUR PATTERNS
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:

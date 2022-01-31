@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'questionnaire',
     'django_rest_passwordreset',
     'rest_framework.authtoken',
+    'adminPanel',
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
         "NAME": os.environ.get("SQL_DATABASE", "moshaver_db"),
         "USER": os.environ.get("SQL_USER", "root"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "fire.NICK0"),
         "HOST": os.environ.get("SQL_HOST", "127.0.0.1"),
     }
 }
