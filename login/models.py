@@ -42,7 +42,7 @@ class Manager(UserManager):
 
 # Create your models here.
 class User(AbstractUser):
-    is_active = models.BooleanField(default=False)
+    email_confirmed_at = models.DateTimeField(null=True)
     GENDER = [ ('M','male'),('F','female')]
     username = None
     email = models.EmailField(unique=True, null=True)
@@ -96,7 +96,7 @@ class Advisor(models.Model):
         ), max_length=3, null=True)
         address = models.CharField("advisor address", max_length=300, null=True)
         telephone = models.CharField(max_length=11, null=True)
-        is_verified = models.BooleanField(default=False, null=True)
+        is_verified = models.BooleanField(null=True)
         daily_begin_time = models.TimeField(null=True)
         daily_end_time = models.TimeField(null=True)
         objects = models.Manager()
