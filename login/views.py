@@ -50,21 +50,21 @@ class SignUpAPI(APIView):
         #print(confirmation_token)
         #print(UserSerializer(user).data['id'])
         #token = Token.objects.get(user).key
-        activate_link_url = "https://moshaver.markop.ir/"
+        activate_link_url = "https://moshaver.markop.ir/login/"
         actiavation_link = f'{activate_link_url}?user_id={UserSerializer(user).data["id"]}&confirmation_token={confirmation_token}'
         # send an e-mail to the user
         context = "لطفا برای فعالسازی حساب خود به لینک زیر مراجعه کنید" + '\n' + str(actiavation_link)
 
-        # send_mail(
-        #     # title:
-        #     "فعالسازی حساب کاربری در مشاوره آنلاین",
-        #     # message:
-        #     context,
-        #     # from:
-        #     "ostadmoshaverteam@gmail.com",
-        #     # to:
-        #     [UserSerializer(user).data["email"]]
-        # )
+        send_mail(
+            # title:
+            "فعالسازی حساب کاربری در مشاوره آنلاین",
+            # message:
+            context,
+            # from:
+            "ostadmoshaverteam@gmail.com",
+            # to:
+            [UserSerializer(user).data["email"]]
+        )
 
         return Response({
             # "user": UserSerializer(user).data,
@@ -501,9 +501,10 @@ class UpdateDocFileStatus(generics.UpdateAPIView):
 
 class ListAnalyticalData(APIView):
     def get(self, request, *args, **kwargs):
-        data_gender = User.objects.raw("select id, COUNT(id) as male_then_female from login_user group by gender")
-        man_percentage = (data_gender[0].male_then_female/(data_gender[0].male_then_female + data_gender[1].male_then_female))*100
-        woman_percentage = (data_gender[1].male_then_female/(data_gender[0].male_then_female + data_gender[1].male_then_female))*100
+        data_gender_male = User.objects.raw("select id, COUNT(id) as male from login_user where gender='M'")
+        data_gender_female = User.objects.raw("select id, COUNT(id) as female from login_user where gender='F'")
+        man_percentage = (data_gender_male[0].male/(data_gender_male[0].male + data_gender_female[0].female))*100
+        woman_percentage = (data_gender_female[0].female/(data_gender_male[0].male + data_gender_female[0].female))*100
         # print(man_percentage)
         # print(woman_percentage)
         data_daily_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 DAY)")
