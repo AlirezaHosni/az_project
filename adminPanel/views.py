@@ -63,7 +63,7 @@ class AdvisorInvitations(APIView):
         advisors = User.objects.raw("select u.id, a.id as advisor_id, image, first_name, last_name from login_user as u inner join login_advisor as a on u.id = a.user_id")
         advisors_list = []
         for adv in advisors:
-            data_reservation_datetime = Invitation.objects.raw("SELECT id, COUNT(id) as num_of_inv FROM login_invitation where advisor_id=%s", [adv.advisor_id])
+            data_reservation_datetime = Invitation.objects.raw("SELECT id, COUNT(id) as num_of_inv FROM login_invitation where advisor_id=%s group by id", [adv.advisor_id])
             
             advisors_list.append({
                 "advisor_id":adv.advisor_id,
