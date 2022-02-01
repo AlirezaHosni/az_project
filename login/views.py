@@ -501,21 +501,21 @@ class UpdateDocFileStatus(generics.UpdateAPIView):
 
 class ListAnalyticalData(APIView):
     def get(self, request, *args, **kwargs):
-        data_gender_male = User.objects.raw("select id, COUNT(id) as male from login_user where gender='M'")
-        data_gender_female = User.objects.raw("select id, COUNT(id) as female from login_user where gender='F'")
-        man_percentage = (data_gender_male[0].male/(data_gender_male[0].male + data_gender_female[0].female))*100
-        woman_percentage = (data_gender_female[0].female/(data_gender_male[0].male + data_gender_female[0].female))*100
+        data_gender_male = User.objects.raw("select id from login_user where gender='M'")
+        data_gender_female = User.objects.raw("select id from login_user where gender='F'")
+        man_percentage = (len(data_gender_male)/(len(data_gender_male) + len(data_gender_female)))*100
+        woman_percentage = (len(data_gender_female)/(len(data_gender_male) + len(data_gender_female)))*100
         # print(man_percentage)
         # print(woman_percentage)
-        data_daily_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 DAY)")
-        data_monthly_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 MONTH)")
-        data_yearly_view = User.objects.raw("select id, COUNT(id) as num from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 YEAR)")
+        data_daily_view = User.objects.raw("select id from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 DAY)")
+        data_monthly_view = User.objects.raw("select id from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 MONTH)")
+        data_yearly_view = User.objects.raw("select id from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 YEAR)")
         # print(data_daily_view[0].num)
         # print(data_monthly_view[0].num)
         # print(data_yearly_view[0].num)
-        data_completed_session = User.objects.raw("SELECT id, COUNT(id)/2 as completed_sessions from chat_chat_user where CURDATE() >= end_session_datetime")
+        data_completed_session = User.objects.raw("SELECT id from chat_chat_user where CURDATE() >= end_session_datetime")
 
-        data_reserved_session = User.objects.raw("SELECT id, COUNT(id) as reserved from login_reservation")
+        data_reserved_session = User.objects.raw("SELECT id from login_reservation")
 
         data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation")
         records_result = []
@@ -529,11 +529,11 @@ class ListAnalyticalData(APIView):
         return Response({
             "man_percentage": man_percentage,
             "woman_percentage": woman_percentage,
-            "daily_view":data_daily_view[0].num,
-            "monthly_view":data_monthly_view[0].num,
-            "yearly_view":data_yearly_view[0].num,
-            "completed_session": data_completed_session[0].completed_sessions,
-            "reserved_session": data_reserved_session[0].reserved,
+            "daily_view":len(data_daily_view),
+            "monthly_view":len(data_monthly_view),
+            "yearly_view":len(data_yearly_view),
+            "completed_session": len(data_completed_session)/2,
+            "reserved_session": len(data_reserved_session),
             "session_hours":int(sum_of_serssion_hours)
         })
 
@@ -544,3 +544,33 @@ class VerifyAdvisor(generics.UpdateAPIView):
 
     def get_object(self):
         return Advisor.objects.get(user_id=self.kwargs['user_id'])
+
+
+class ResendVerificationEmail(APIView):
+    def post(self, request):
+        # serializer = RegisterSerializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+        # user = serializer.save()
+        confirmation_token = Email_Verification.objects.get(user_id=request.user.id).key
+        #print(confirmation_token)
+        #print(UserSerializer(user).data['id'])
+        #token = Token.objects.get(user).key
+        activate_link_url = "https://moshaver.markop.ir/login/"
+        actiavation_link = f'{activate_link_url}?user_id={request.user.id}&confirmation_token={confirmation_token}'
+        # send an e-mail to the user
+        context = "لطفا برای فعالسازی حساب خود به لینک زیر مراجعه کنید" + '\n' + str(actiavation_link)
+
+        send_mail(
+            # title:
+            "فعالسازی حساب کاربری در مشاوره آنلاین",
+            # message:
+            context,
+            # from:
+            "ostadmoshaverteam@gmail.com",
+            # to:
+            [request.user.email]
+        )
+
+        return Response({
+            "Result":"ایمیل تایید مجددا ارسال شد!"
+        })

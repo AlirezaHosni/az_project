@@ -149,9 +149,11 @@ class ListReservationDetails(APIView):
             elif(timezone.now() > r.end_session_datetime):
                 st = "به انمام رسیده"
             result_list.append({
+                "advisor_id":advisor[0].id,
                 "advisor_image": str(advisor[0].image),
                 "advisor_first_name":advisor[0].first_name,
                 "advisor_last_name":advisor[0].last_name,
+                "user_id":user.id,
                 "user_image":str(user.image),
                 "user_first_name":user.first_name,
                 "user_last_name":user.last_name,
