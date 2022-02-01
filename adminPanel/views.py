@@ -139,7 +139,7 @@ class ListReservationDetails(APIView):
         res = Reservation.objects.all()
         result_list = []
         for r in res:
-            advisor = User.objects.raw("select u.id, image, first_name, last_name from login_advisor as a inner join login_user as u on a.user_id=u.id where a.id=%s", [r.advisor_user_id])
+            advisor = User.objects.raw("select u.id, image, first_name, last_name from login_advisor as a inner join login_user as u on a.user_id=u.id where u.id=%s", [r.advisor_user_id])
             user = User.objects.get(id=r.user_id)
             st=""
             if(timezone.now() >= r.reservation_datetime and timezone.now() <= r.end_session_datetime):    
