@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'password', 'first_name', 'last_name', 'phone_number', 'gender', 'year_born',
-                  'is_advisor', 'image']
+                  'is_advisor', 'image', 'is_staff']
 
     def update(self, instance, validated_data):
         password = validated_data.get('password')

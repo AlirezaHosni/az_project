@@ -512,6 +512,9 @@ class ListAnalyticalData(APIView):
         data_yearly_view = User.objects.raw("select id from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 YEAR)")
         # print(data_daily_view[0].num)
         # print(data_monthly_view[0].num)
+        data_daily_joined = User.objects.raw("select id from login_user where created_on <= (CURDATE() + INTERVAL 1 DAY) AND created_on >= (CURDATE() - INTERVAL 1 DAY)")
+        data_monthly_joined = User.objects.raw("select id from login_user where created_on <= (CURDATE() + INTERVAL 1 DAY) AND created_on >= (CURDATE() - INTERVAL 1 MONTH)")
+        data_yearly_joined = User.objects.raw("select id from login_user where created_on <= (CURDATE() + INTERVAL 1 DAY) AND created_on >= (CURDATE() - INTERVAL 1 YEAR)")
         # print(data_yearly_view[0].num)
         data_completed_session = User.objects.raw("SELECT id from chat_chat_user where CURDATE() >= end_session_datetime")
 
@@ -534,7 +537,10 @@ class ListAnalyticalData(APIView):
             "yearly_view":len(data_yearly_view),
             "completed_session": len(data_completed_session)/2,
             "reserved_session": len(data_reserved_session),
-            "session_hours":int(sum_of_serssion_hours)
+            "session_hours":int(sum_of_serssion_hours),
+            "daily_joined":len(data_daily_joined),
+            "monthly_joined":len(data_monthly_joined),
+            "yearly_joined":len(data_yearly_joined)
         })
 
 
