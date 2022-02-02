@@ -1,6 +1,6 @@
 from django.urls import path
 
-from adminPanel.views import DeleteReservationByAdmin, ListReservationDetails, ListAdvisorChat, RetrieveParticularAdvisorChats, DeleteParticularInvitationByAdmin, ListInvitationForAdmin, AdvisorInvitations, ListUsersInfo, CreateUserByAdmin, DeleteUserByAdmin, getUserInfo
+from adminPanel.views import createAdvisor, getAdvisorList, DeleteAdvisor, ListRate, ListParticularUserRates, UpdateCommentStatus, DeleteReservationByAdmin, ListReservationDetails, ListAdvisorChat, RetrieveParticularAdvisorChats, DeleteParticularInvitationByAdmin, ListInvitationForAdmin, AdvisorInvitations, ListUsersInfo, CreateUserByAdmin, DeleteUserByAdmin, getUserInfo
 
 urlpatterns = [
     path('create-user/', CreateUserByAdmin.as_view()),
@@ -14,6 +14,14 @@ urlpatterns = [
     path('list-advisors-chat/', ListAdvisorChat.as_view()),
     path('list-reservation-details/', ListReservationDetails.as_view()),
     path('delete-reservation/<int:reservation_id>', DeleteReservationByAdmin.as_view()),
+    
+    path('delete-or-update-comment-status/<int:rate_id>/', UpdateCommentStatus.as_view()),
+    path('list-particular-user-rates/<int:user_id>/', ListParticularUserRates.as_view()),
+    path('list-users-rates/', ListRate.as_view()),
+    path('delete-advisor/<int:user_id>/', DeleteAdvisor.as_view()),
+    path('list-advisors/', getAdvisorList.as_view()),
+    path('create-advisors/', createAdvisor.as_view()),
+
 
 
 ]

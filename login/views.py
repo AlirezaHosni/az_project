@@ -511,10 +511,15 @@ class ListAnalyticalData(APIView):
         data_monthly_view = User.objects.raw("select id from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 MONTH)")
         data_yearly_view = User.objects.raw("select id from login_user where last_login <= (CURDATE() + INTERVAL 1 DAY) AND last_login >= (CURDATE() - INTERVAL 1 YEAR)")
         # print(data_daily_view[0].num)
-        daily = []
+        daily_user = []
+        daily_advisor = []
         for i in range(0, 31):
-            data_daily_view = User.objects.raw("select id from login_user where created_on <= (CURDATE() - INTERVAL %s DAY) AND created_on >= (CURDATE() - INTERVAL %s DAY)",[i, i+1])
-            daily.append(len(data_daily_view))
+            data_daily_advisor_joined = User.objects.raw("select u.id from login_user as u where u.created_on <= (CURDATE() - INTERVAL %s DAY) AND u.created_on >= (CURDATE() - INTERVAL %s DAY) AND u.is_advisor=1",[i, i+1])
+            daily_advisor.append(len(data_daily_advisor_joined))
+
+        for i in range(0, 31):
+            data_daily_user_joined = User.objects.raw("select u.id from login_user as u where u.created_on <= (CURDATE() - INTERVAL %s DAY) AND u.created_on >= (CURDATE() - INTERVAL %s DAY) AND u.is_advisor=0",[i, i+1])
+            daily_user.append(len(data_daily_user_joined))
         # print(data_monthly_view[0].num)
         # data_daily_joined = User.objects.raw("select id from login_user where created_on <= (CURDATE() + INTERVAL 1 DAY) AND created_on >= (CURDATE() - INTERVAL 1 DAY)")
         # data_monthly_joined = User.objects.raw("select id from login_user where created_on <= (CURDATE() + INTERVAL 1 DAY) AND created_on >= (CURDATE() - INTERVAL 1 MONTH)")
@@ -542,7 +547,8 @@ class ListAnalyticalData(APIView):
             "completed_session": len(data_completed_session)/2,
             "reserved_session": len(data_reserved_session),
             "session_hours":int(sum_of_serssion_hours),
-            "daily_joined":daily
+            "daily_user_joined":daily_user,
+            "daily_advisor_joined":daily_advisor
         })
 
 
