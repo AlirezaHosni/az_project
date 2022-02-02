@@ -80,6 +80,7 @@ class LoginUserAPI(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         user.status = 'online'
+        us = User.objects.filter(id=user.id).update(last_login=datetime.datetime.now())
         user.save()
         return Response({'token': token.key})
 
@@ -590,7 +591,46 @@ class ResendVerificationEmail(APIView):
         })
 
 
-class ListAdvisorReservation(generics.ListAPIView):
-    serializer_class = ReservationSerializer
+class ListAdvisorReservation(APIView):
+    serializer_class = ReservationAdvSerializer
     def get_queryset(self):
         return Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
+    # def get(self, request):
+    #     reses = Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
+    #     io = []
+    #     for res in reses:
+    #         date_time_b = res.reservation_datetime
+    #         datetime_b = self.gregorian_to_jalali(date_time_b.year, date_time_b.month, date_time_b.day)
+    #         date_time_e = res.end_session_datetime
+    #         datetime_e = self.gregorian_to_jalali(date_time_e.year, date_time_e.month, date_time_e.day)
+    #         io.append({
+    #             "id":res.id,
+    #             "reservation_datetime":"%s-%s-%s ",
+    #             "end_session_datetime":res.end_session_datetime,
+    #             "created_at":res.created_at,
+    #             "advisor_user_id":res.advisor_user_id,
+    #             "user_id":res.user_id
+    #         })
+    #     return Response()
+
+    # def gregorian_to_jalali(gy, gm, gd):
+    #     g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+    #     if (gm > 2):
+    #         gy2 = gy + 1
+    #     else:
+    #         gy2 = gy
+    #         days = 355666 + (365 * gy) + ((gy2 + 3) // 4) - ((gy2 + 99) // 100) + ((gy2 + 399) // 400) + gd + g_d_m[gm - 1]
+    #         jy = -1595 + (33 * (days // 12053))
+    #         days %= 12053
+    #         jy += 4 * (days // 1461)
+    #         days %= 1461
+    #     if (days > 365):
+    #         jy += (days - 1) // 365
+    #         days = (days - 1) % 365
+    #     if (days < 186):
+    #         jm = 1 + (days // 31)
+    #         jd = 1 + (days % 31)
+    #     else:
+    #         jm = 7 + ((days - 186) // 30)
+    #         jd = 1 + ((days - 186) % 30)
+    #     return [jy, jm, jd]
