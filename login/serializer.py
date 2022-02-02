@@ -521,3 +521,10 @@ class UpdateFileStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advisor_Document
         fields = ['confirmed_at']
+
+
+class ReservationAdvSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Reservation
+        fields='__all__'
+        read_only_fields=['id','advisor_user_id','user_id']

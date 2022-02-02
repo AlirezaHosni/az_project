@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 
 import login
 from rest_framework import serializers
-from login.models import User, Advisor_History, Advisor, Rate
+from login.models import User, Advisor_History, Advisor, Rate, Reservation
 import datetime
 
 
@@ -124,3 +124,9 @@ class RateSerializer(serializers.ModelSerializer):
         fields='__all__'
         read_only_fields=['id','advisor_id','user_id']
     
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Reservation
+        fields='__all__'
+        read_only_fields=['id','advisor_user_id','user_id']

@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
 from .models import Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .serializer import ReservationAdvSerializer, UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -588,3 +588,9 @@ class ResendVerificationEmail(APIView):
         return Response({
             "Result":"ایمیل تایید مجددا ارسال شد!"
         })
+
+
+class ListAdvisorReservation(generics.ListAPIView):
+    serializer_class = ReservationSerializer
+    def get_queryset(self):
+        return Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
