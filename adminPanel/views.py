@@ -221,12 +221,12 @@ class DeleteAdvisor(APIView):
 
 class ListRate(APIView):
     def get(self, request, *args, **kwargs):
-        users = User.objects.raw("select advisor_id as id from login_rate")
+        users = Rate.objects.all()
         us = []
         for i in users:
-            user_rates = Rate.objects.filter(advisor_id=i)
+            user_rates = Rate.objects.filter(advisor_id=i.advisor_id)
             num_of_rates = len(user_rates)
-            user = User.objects.raw("select u.id, u.id as user_id, a.id as advisor_id first_name, last_name from login_user as u inner join login_advisor as a on u.id=a.user_id where a.id=%s",[i])
+            user = User.objects.raw("select u.id, u.id as user_id, a.id as advisor_id, first_name, last_name from login_user as u inner join login_advisor as a on u.id=a.user_id where a.id=%s",[i.advisor_id])
             us.append({
                 "id":user[0].id,
                 "user_id":user[0].user_id,
