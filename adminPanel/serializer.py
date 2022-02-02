@@ -130,3 +130,17 @@ class ReservationSerializer(serializers.ModelSerializer):
         model=Reservation
         fields='__all__'
         read_only_fields=['id','advisor_user_id','user_id']
+
+
+
+class AdvisorSerializer(serializers.ModelSerializer):
+    first_name= serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    phone_number = serializers.CharField()
+    gender = serializers.CharField()
+    year_born = serializers.DateTimeField()
+    class Meta:
+        model = Advisor
+        fields = '__all__'
+        read_only_fields = ['user_id']

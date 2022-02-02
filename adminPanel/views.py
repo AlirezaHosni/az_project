@@ -2,7 +2,7 @@
 # Create your views here.
 from rest_framework import generics, permissions
 
-from adminPanel.serializer import ReservationSerializer, RateSerializer, createAdvisorSerializer, ListUsersInfoSerializer, UserSerializer, RateSerializer
+from adminPanel.serializer import  ReservationSerializer, RateSerializer, createAdvisorSerializer, ListUsersInfoSerializer, UserSerializer, RateSerializer
 from chat.serializers import ChatListSerializer
 from login.models import Advisor, User, Reservation, Invitation, Rate
 from chat.models import Chat_User, Chat
@@ -275,7 +275,6 @@ class RetrieveAdvisorInfo(generics.RetrieveAPIView):
     serializer_class = AdvisorSerializer
     def get_object(self):
         return Advisor.objects.get(id=self.kwargs['advisor_id'])
-
 
 
 

@@ -80,7 +80,8 @@ class LoginUserAPI(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         user.status = 'online'
-        us = User.objects.filter(id=user.id).update(last_login=datetime.datetime.now())
+        # User.objects.filter(id=user.id).update(last_login=datetime.datetime.now())
+        user.last_login=datetime.datetime.now()
         user.save()
         return Response({'token': token.key})
 
@@ -591,7 +592,7 @@ class ResendVerificationEmail(APIView):
         })
 
 
-class ListAdvisorReservation(APIView):
+class ListAdvisorReservation(generics.ListAPIView):
     serializer_class = ReservationAdvSerializer
     def get_queryset(self):
         return Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
