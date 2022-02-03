@@ -82,8 +82,10 @@ class LoginUserAPI(ObtainAuthToken):
         user.status = 'online'
         # User.objects.filter(id=user.id).update(last_login=datetime.datetime.now())
         user.last_login=datetime.datetime.now()
+        cf = user.email_confirmed_at
         user.save()
-        return Response({'token': token.key})
+        return Response({'token': token.key,
+        "email_confirmed_at":cf})
 
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
