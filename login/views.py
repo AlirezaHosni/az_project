@@ -647,7 +647,7 @@ class DeleteReservedSessionByAdvisor(APIView):
             # Advisor.objects.filter(user_id=self.kwargs['user_id']).delete()
             # User.objects.filter(id=advisor.user_id).delete()
             res = Reservation.objects.get(id=self.kwargs['reservation_id'])
-            cu = Chat_User.objects.filter(user_id=res.user_id)
+            cu = Chat_User.objects.get(user_id=res.user_id)
             Chat_User.objects.filter(user_id=res.user_id).delete()
             Chat_User.objects.filter(user_id=res.advisor_user_id).delete()
             Chat.objects.filter(id=cu.chat_id).delete()
