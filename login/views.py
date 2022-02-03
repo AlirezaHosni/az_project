@@ -188,7 +188,7 @@ class CreateInvitationAPI(generics.CreateAPIView):
     
 class CreateRateAPI(generics.CreateAPIView):
     serializer_class = RateSerializer
-    permission_classes = (permissions.IsAuthenticated,IsChatExist,IsChatDone,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class ListRateAPI(generics.ListAPIView):
