@@ -62,8 +62,8 @@ application = ProtocolTypeRouter({
   "websocket": 
         URLRouter([
             path('ws/chat/<int:chat_id>/<str:token>/', Send_Message.as_asgi()),
-            path('ws/user/request/<str:advisor_id>/<str:request_content>', RequestConsumer.as_asgi()),
-            path('ws/advisor/request/<str:request_id>/<int:answer>', RequestConsumer.as_asgi()),
+            path('ws/user/request/<int:advisor_id>/<str:request_content>/<str:token>/', RequestConsumer.as_asgi()),
+            path('ws/advisor/request/<int:request_id>/<int:answer>/<str:token>/', RequestConsumer.as_asgi()),
         ]),
     
 })

@@ -1,3 +1,6 @@
+import random
+import string
+
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -6,6 +9,7 @@ import channels.layers
 from rest_framework.generics import get_object_or_404
 from login.models import User, Request, Advisor, Reservation, Notifiaction
 from chat.models import Chat_User, Chat
+from rest_framework.authtoken.models import Token
 
 from datetime import timedelta
 
@@ -13,47 +17,63 @@ from datetime import timedelta
 class RequestConsumer(WebsocketConsumer):
     def connect(self):
 
-        global answer, group_title, advisor, user
+        self.answer = False
+        self.group_title = ''.join((random.choice(string.ascii_lowercase) for x in range(30)))
 
         if self.scope['path'][4:8] == 'user':
-            print('user connected')
-            advisor = get_object_or_404(Advisor, id=self.scope['url_route']['kwargs']['advisor_id'])
-            group_title = self.scope['user'].id + advisor.id
-            user = self.scope['user']
-            request_content = self.scope['url_route']['kwargs']['request_content']
-            Request.objects.create(sender=user, receiver=advisor, request_content=request_content)
-            print('request created')
-            Notifiaction.objects.create(type='r', user_id=advisor.id)
-            print('notification created')
+
+            try:
+                token = self.scope['url_route']['kwargs']['token']
+                # print(token)
+                self.user_id = Token.objects.get(key=token).user_id
+                # print(self.user_id)
+                self.user = get_object_or_404(User, id=self.user_id)
+                # print('user connected')
+                self.advisor = get_object_or_404(Advisor, id=self.scope['url_route']['kwargs']['advisor_id'])
+                self.group_title = self.user.id + self.advisor.id
+                request_content = self.scope['url_route']['kwargs']['request_content']
+                Request.objects.create(sender=self.user, receiver=self.advisor, request_content=request_content)
+                # print('request created')
+                # Notifiaction.objects.create(type='r', user_id=self.advisor.id)
+                # print('notification created')
+                self.accept()
+            except(Token.DoesNotExist):
+                return {
+                    "error": "این کاربر ناشناخته هست. ابتدا  وارد سایت شوید"
+                }
 
 
         else:
-            request_id = self.scope['url_route']['kwargs']['request_id']
-            answer = self.scope['url_route']['kwargs']['answer']
-            print('advisor connected')
-            print(request_id)
-            print(answer)
-            request = get_object_or_404(Request, id=request_id, receiver=self.scope['user'])
-            # user = request.sender
-            request.is_checked = True
-            request.is_accepted = True if (answer == 1) else False
-            request.save()
-            group_title = request.sender.id + self.scope['user'].id
 
-        async_to_sync(self.channel_layer.group_add)(
-            group_title,
-            self.channel_name
-        )
-        self.accept()
+            try:
+                token = self.scope['url_route']['kwargs']['token']
+                self.adviser_id = Token.objects.get(key=token).user_id
+                self.advisor = get_object_or_404(Advisor, user_id=self.adviser_id)
+                request_id = self.scope['url_route']['kwargs']['request_id']
+                self.answer = self.scope['url_route']['kwargs']['answer']
+                request = get_object_or_404(Request, id=request_id, receiver=self.advisor)
+                self.user = request.sender
+                request.is_checked = True
+                request.is_accepted = True if (self.answer == 1) else False
+                request.save()
+                self.group_title = self.user.id + self.advisor.id
 
-        if answer == 1:
-            self.accept_response(advisor, user)
-        elif answer == 0:
-            self.reject_response()
+                self.accept()
+
+                if self.answer == 1:
+                    self.accept_response(self.advisor, self.user)
+                elif self.answer == 0:
+                    self.reject_response()
+
+
+            except(Token.DoesNotExist):
+                return {
+                    "error": "این کاربر ناشناخته هست. ابتدا  وارد سایت شوید"
+                }
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
-            group_title,
+            self.group_title,
             self.channel_name
         )
 
@@ -67,18 +87,22 @@ class RequestConsumer(WebsocketConsumer):
 
     def reject_response(self):
 
-        print('rejected')
+
         self.send(text_data=json.dumps({
-            'message': 0,
-            'chat': '',
-            'reservation': ''
+            'answer': 'rejected',
+            'chat_id': '',
+            'reservation_id': ''
         }))
 
     def accept_response(self, advisor, user):
 
-        print('accepted')
-        chat_title = user.email + ' ' + advisor.email
-        chat = Chat.objects.create(title=chat_title)
+
+        chat_title = user.email + ' ' + advisor.user.email
+        is_duplicate_chat = Chat.objects.filter(title=chat_title)
+        if is_duplicate_chat.count == 0:
+            chat = Chat.objects.create(title=chat_title)
+        else:
+            chat = is_duplicate_chat.first()
         Chat_User.objects.create(chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
@@ -90,12 +114,14 @@ class RequestConsumer(WebsocketConsumer):
                                  chat_id=chat.id,
                                  user_id=advisor.id)
         reservation = Reservation.objects.create(user_id=user.id,
-                                                 advisor_user_id=advisor,
+                                                 advisor_user_id=advisor.id,
                                                  reservation_datetime=chat.time_started,
                                                  end_session_datetime=chat.time_started + timedelta(
                                                      minutes=60))
         self.send(text_data=json.dumps({
-            'message': 1,
-            'chat': chat,
-            'reservation': reservation
+            'answer': 'accepted',
+            'chat_id': chat.id,
+            'reservation_id': reservation.id,
+            # 'reservation_datetime': reservation.reservation_datetime,
+            # 'end_session_datetime': reservation.end_session_datetime
         }))
