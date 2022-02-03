@@ -32,7 +32,7 @@ from .custom_renderer import JpegRenderer, PngRenderer
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-
+from chat.models import Chat_User, Chat
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 # run this command for knox
@@ -596,8 +596,9 @@ class ResendVerificationEmail(APIView):
 
 class ListAdvisorReservation(generics.ListAPIView):
     serializer_class = ReservationAdvSerializer
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
-        return Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
+        return Reservation.objects.raw("select r.id, r.user_id, r.advisor_user_id, reservation_datetime, end_session_datetime, created_at, first_name, last_name from login_reservation as r inner join login_user as u on r.user_id=u.id where r.advisor_user_id=%s", [self.request.user.id])
     # def get(self, request):
     #     reses = Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
     #     io = []
@@ -637,3 +638,24 @@ class ListAdvisorReservation(generics.ListAPIView):
     #         jm = 7 + ((days - 186) // 30)
     #         jd = 1 + ((days - 186) % 30)
     #     return [jy, jm, jd]
+
+
+class DeleteReservedSessionByAdvisor(APIView):
+    def delete(self, request, *args, **kwargs):
+        try:
+            # advisor = Advisor.objects.get(user_id=self.kwargs['user_id'])
+            # Advisor.objects.filter(user_id=self.kwargs['user_id']).delete()
+            # User.objects.filter(id=advisor.user_id).delete()
+            res = Reservation.objects.get(id=self.kwargs['reservation_id'])
+            cu = Chat_User.objects.filter(user_id=res.user_id)
+            Chat_User.objects.filter(user_id=res.user_id).delete()
+            Chat_User.objects.filter(user_id=res.advisor_user_id).delete()
+            Chat.objects.filter(id=cu.chat_id).delete()
+
+            return Response({
+                "message": "رزرو حذف شد"
+            })
+        except(Chat_User.DoesNotExist):
+            return Response({
+                "message":"چنین رزروی وجود ندارد"
+            })

@@ -524,6 +524,8 @@ class UpdateFileStatusSerializer(serializers.ModelSerializer):
 
 
 class ReservationAdvSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
     class Meta:
         model=Reservation
         fields='__all__'
