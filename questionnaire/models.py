@@ -20,18 +20,18 @@ class Questionnaire(models.Model):
 class Questionnaire_User(models.Model):
     questionnaire = models.ForeignKey("Questionnaire", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_questionnaire")
-    total = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    somatization = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    obsessive_compulsive = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
+    total = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    somatization = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    obsessive_compulsive = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
     interpersonal_sensitivity = models.IntegerField(default=-1,
-                                                    validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    depression = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    anxiety = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    hostility = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    tophobic_anxietytal = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    paranoid_ideation = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    psychoticism = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    other = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
+                                                    validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    depression = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    anxiety = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    hostility = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    tophobic_anxietytal = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    paranoid_ideation = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    psychoticism = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
+    other = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -45,20 +45,19 @@ class Questionnaire_User(models.Model):
 class Question(models.Model):
     questionnaire = models.ForeignKey("Questionnaire", on_delete=models.CASCADE)
     description = models.CharField(max_length=255)
-    score = models.IntegerField(default=-1, validators=[MaxValueValidator(5), MinValueValidator(-1)])
-    category = models.CharField(choices=(
-        ('s', 'somatization'),
-        ('oc', 'obsessive_compulsive'),
-        ('is', 'interpersonal_sensitivity'),
-        ('d', 'depression'),
-        ('a', 'anxiety'),
-        ('h', 'hostility'),
-        ('pa', 'phobic_anxiety'),
-        ('pi', 'paranoid_ideation'),
-        ('p', 'psychoticism'),
-        ('o', 'other'),
+    category = models.CharField(choices=[
+        ('somatization', 'somatization'),
+        ('obsessive_compulsive', 'obsessive_compulsive'),
+        ('interpersonal_sensitivity', 'interpersonal_sensitivity'),
+        ('depression', 'depression'),
+        ('anxiety', 'anxiety'),
+        ('hostility', 'hostility'),
+        ('phobic_anxiety', 'phobic_anxiety'),
+        ('paranoid_ideation', 'paranoid_ideation'),
+        ('psychoticism', 'psychoticism'),
+        ('other', 'other'),
 
-    ), max_length=2, null=True)
+    ], max_length=100, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -69,17 +68,13 @@ class Question(models.Model):
     class Meta:
         ordering = ['-updated_at']
 
+
 class Answer(models.Model):
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_answer")
-    description = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
+    score = models.IntegerField(default=-1, validators=[MaxValueValidator(4), MinValueValidator(-1)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        limit = 50
-        return self.description[:limit] + ('...' if len(self.description) > limit else '')
 
     class Meta:
         ordering = ['-updated_at']

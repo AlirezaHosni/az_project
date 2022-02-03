@@ -24,23 +24,26 @@ class RetrieveUpdateDestroyQuestionnaireAPIView(generics.RetrieveUpdateDestroyAP
         return obj
 
 
-class CreateListQuestionAPIView(generics.ListCreateAPIView):
+class ListQuestionAPIView(generics.ListAPIView):
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return Question.objects.all()
 
-class RetrieveUpdateDestroyQuestionAPIView(generics.UpdateAPIView):
-    serializer_class = QuestionSerializer
+
+class CreateAnswerAPIView(generics.CreateAPIView):
+    serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['put']
+    # http_method_names = ['put']
 
-    def get_object(self):
-        obj = get_object_or_404(Question, id=self.kwargs.get('id'))
-        # self.check_object_permissions(self.request, obj)
-        return obj
+    # def get_object(self):
+    #     obj = get_object_or_404(Answer, Q(user=self.request.user) & Q(question=obj))
+    #     # self.check_object_permissions(self.request, obj)
+    #     return obj
 
 
-class CreateListQuestionnaire_UserAPIView(generics.ListCreateAPIView):
+class CreateListQuestionnaire_UserAPIView(generics.CreateAPIView):
     serializer_class = Questionnaire_UserSerializer
     permission_classes = [IsAuthenticated]
 
