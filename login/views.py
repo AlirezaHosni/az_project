@@ -85,7 +85,7 @@ class LoginUserAPI(ObtainAuthToken):
         cf = user.email_confirmed_at
         user.save()
         return Response({'token': token.key,
-        "email_confirmed_at":cf})
+        "email_confirmed_at":str(cf)})
 
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
