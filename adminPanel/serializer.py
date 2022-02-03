@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 
 import login
 from rest_framework import serializers
-from login.models import User, Advisor_History, Advisor, Rate
+from login.models import User, Advisor_History, Advisor, Rate, Reservation
 import datetime
 
 
@@ -16,10 +16,10 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(email=validated_data['email'], password=validated_data['password'],
                                         phone_number=validated_data['phone_number'],
                                         first_name=validated_data['first_name'],
-                                        last_name=validated_data['last_name'], is_advisor=validated_data['is_advisor'],
+                                        last_name=validated_data['last_name'], is_advisor=False,
                                         gender=validated_data['gender'], year_born=validated_data['year_born'],
                                         email_confirmed_at=datetime.datetime.now())
-        
+        return user
         
 
 
@@ -124,3 +124,23 @@ class RateSerializer(serializers.ModelSerializer):
         fields='__all__'
         read_only_fields=['id','advisor_id','user_id']
     
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Reservation
+        fields='__all__'
+        read_only_fields=['id','advisor_user_id','user_id']
+
+
+
+class AdvisorSerializer(serializers.ModelSerializer):
+    first_name= serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    phone_number = serializers.CharField()
+    gender = serializers.CharField()
+    year_born = serializers.DateTimeField()
+    class Meta:
+        model = Advisor
+        fields = '__all__'
+        read_only_fields = ['user_id']

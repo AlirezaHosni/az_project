@@ -2,11 +2,11 @@
 # Create your views here.
 from rest_framework import generics, permissions
 
-from adminPanel.serializer import RateSerializer, createAdvisorSerializer, ListUsersInfoSerializer, UserSerializer, RateSerializer
+from adminPanel.serializer import  ReservationSerializer, RateSerializer, createAdvisorSerializer, ListUsersInfoSerializer, UserSerializer, RateSerializer
 from chat.serializers import ChatListSerializer
 from login.models import Advisor, User, Reservation, Invitation, Rate
 from chat.models import Chat_User, Chat
-from login.serializer import CreateInvitationSerializer
+from login.serializer import CreateInvitationSerializer, AdvisorSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
@@ -178,7 +178,7 @@ class createAdvisor(generics.CreateAPIView):
 class getAdvisorList(APIView):
     def get(self, request, *args, **kwargs):
         # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-        users = User.objects.raw("select res.user_id as id ,res.user_id as user_id, res.created_on, COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name from login_rate as r right join (select a.id,u.id as user_id,created_on,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id) as res on advisor_id =res.id group by res.id order by rate desc")
+        users = User.objects.raw("select res.user_id as id, res.id as advisor_id ,res.user_id as user_id, res.created_on, COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name from login_rate as r right join (select a.id,u.id as user_id,created_on,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id) as res on advisor_id =res.id group by res.id order by rate desc")
         each_user_hours = []
         for user in users:
             data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation where user_id=%s", [user.user_id])
@@ -189,6 +189,7 @@ class getAdvisorList(APIView):
             for i in records_result:
                 sum_of_serssion_hours += i
             each_user_hours.append({
+                "advisor_id":user.advisor_id,
                 "user_id":user.user_id,
                 "first_name":user.first_name,
                 "last_name":user.last_name,
@@ -220,17 +221,19 @@ class DeleteAdvisor(APIView):
 
 class ListRate(APIView):
     def get(self, request, *args, **kwargs):
-        users = User.objects.raw("select id, user_id from login_rate group by user_id")
+        users = Rate.objects.all()
         us = []
         for i in users:
-            user_rates = Rate.objects.filter(user_id=i)
+            user_rates = Rate.objects.filter(advisor_id=i.advisor_id)
             num_of_rates = len(user_rates)
-            user = User.objects.get(id=i)
+            user = User.objects.raw("select u.id, u.id as user_id, a.id as advisor_id, first_name, last_name from login_user as u inner join login_advisor as a on u.id=a.user_id where a.id=%s",[i.advisor_id])
             us.append({
-                "id":user.id,
+                "id":user[0].id,
+                "user_id":user[0].user_id,
+                "advisor_id":user[0].advisor_id,
                 "num_of_rates":num_of_rates,
-                "first_name":user.first_name,
-                "last_name":user.last_name
+                "first_name":user[0].first_name,
+                "last_name":user[0].last_name
             })
         return Response({
             "users":us
@@ -238,15 +241,19 @@ class ListRate(APIView):
 
 class ListParticularUserRates(APIView):
     def get(self, request, *args, **kwargs):
-        rates = Rate.objects.filter(user_id=self.kwargs['user_id'])
+        rates = Rate.objects.filter(advisor_id=self.kwargs['advisor_id'])
         us = []
         for rate in rates:
-            advisor = Advisor.objects.get(id=rate.advisor_id)
-            advisor_user = User.objects.get(id=advisor.user_id)
+            # advisor = Advisor.objects.get(id=rate.advisor_id)
+            user = User.objects.get(id=rate.user_id)
             us.append({
-                "advisor_user_id":advisor_user.id,
-                "advisor_first_name":advisor_user.first_name,
-                "advisor_last_name":advisor_user.last_name,
+                "user_id":user.id,
+                "first_name":user.first_name,
+                "last_name":user.last_name,
+                "gender": user.gender,
+                "email": user.email,
+                "phone_number": user.phone_number,
+                "year_born": user.year_born,
                 "rate_id":rate.id,
                 "text":rate.text,
                 "rate_created_on":rate.created_at,
@@ -262,6 +269,13 @@ class UpdateCommentStatus(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RateSerializer
     def get_object(self):
         return Rate.objects.get(id=self.kwargs['rate_id'])
+
+
+class RetrieveAdvisorInfo(generics.RetrieveAPIView):
+    serializer_class = AdvisorSerializer
+    def get_object(self):
+        return Advisor.objects.get(id=self.kwargs['advisor_id'])
+
 
 
 
