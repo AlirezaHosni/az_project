@@ -22,33 +22,32 @@ class Send_Message(WebsocketConsumer):
 
     def new_message(self, data):
         user_contact = self.user_id
-        # if self.has_permission_is_chat_get_started(self.user_id, self.chat_id) and self.has_permission_according_to_end_session_datetime(self.user_id, self.chat_id):
-        message = Message.objects.create(
-        user_id=user_contact,
-        chat_id=self.scope['url_route']['kwargs']['chat_id'],
-        text=data['text'])
-        print(message.text)
-        print(message.text)
-        print(message.text)
-        print(message.text)
-    
+        if self.has_permission_is_chat_get_started(self.user_id, self.chat_id) and self.has_permission_according_to_end_session_datetime(self.user_id, self.chat_id):
+            message = Message.objects.create(
+            user_id=user_contact,
+            chat_id=self.scope['url_route']['kwargs']['chat_id'],
+            text=data['text'])
+            print(message.text)
+            print(message.text)
+            print(message.text)
+        
 
-        # current_chat = get_current_chat(data['chatId'])
-        # current_chat.messages.add(message)
-        # current_chat.save()
-        content = {
-            'command': 'new_message',
-            'message': self.message_to_json(message)
-        }
-        print("message.text" + " " + "message.text")
+            # current_chat = get_current_chat(data['chatId'])
+            # current_chat.messages.add(message)
+            # current_chat.save()
+            content = {
+                'command': 'new_message',
+                'message': self.message_to_json(message)
+            }
+            print("message.text" + " " + "message.text")
 
-        return self.send_chat_message(content)
-        # else:
-        #     print("error error error")
-        #     print("error error error")
-        #     print("error error error")
-        #     print("error error error")
-        #     return Response(status.HTTP_403_FORBIDDEN)
+            return self.send_chat_message(content)
+        else:
+            print("error error error")
+            print("error error error")
+            print("error error error")
+            print("error error error")
+            return Response(status.HTTP_403_FORBIDDEN)
 
     def messages_to_json(self, messages):
         result = []
