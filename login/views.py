@@ -563,6 +563,12 @@ class VerifyAdvisor(generics.UpdateAPIView):
     def get_object(self):
         return Advisor.objects.get(user_id=self.kwargs['user_id'])
 
+class AdvProfileByAdvId(generics.RetrieveAPIView):
+    serializer_class = AdvisorSerializer
+
+    def get_object(self):
+        return Advisor.objects.get(id=self.kwargs['advisor_id'])
+
 
 class ResendVerificationEmail(APIView):
     def post(self, request):
