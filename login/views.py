@@ -569,7 +569,9 @@ class AdvProfileByAdvId(APIView):
     def get(self, request, *args, **kwargs):
         a = Advisor.objects.raw("select u.id, a.id as advisor_id, first_name,last_name,email,year_born,phone_number,gender,image, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where a.id=%s", [self.kwargs['advisor_id']])
         g = Advisor_History.objects.filter(advisor_id=a[0].advisor_id)
-        
+        arr=[]
+        for i in g:
+            arr.append(i.granted_prize)
 
         return Response({
             "id": a[0].id,
@@ -589,7 +591,7 @@ class AdvProfileByAdvId(APIView):
             "is_sport_advisor": a[0].is_sport_advisor,
             "is_family_advisor": a[0].is_family_advisor,
             "is_mental_advisor": a[0].is_mental_advisor,
-            "granted_prize": g
+            "granted_prize": arr
         })
             
 
