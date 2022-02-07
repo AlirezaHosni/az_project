@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
 from .models import Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import ReservationAdvSerializer, UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .serializer import AdvisorAdvSerializer, ReservationAdvSerializer, UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -563,11 +563,35 @@ class VerifyAdvisor(generics.UpdateAPIView):
     def get_object(self):
         return Advisor.objects.get(user_id=self.kwargs['user_id'])
 
-class AdvProfileByAdvId(generics.RetrieveAPIView):
-    serializer_class = AdvisorSerializer
+class AdvProfileByAdvId(APIView):
+    # serializer_class = AdvisorAdvSerializer
 
-    def get_object(self):
-        return Advisor.objects.get(id=self.kwargs['advisor_id'])
+    def get(self, request, *args, **kwargs):
+        a = Advisor.objects.raw("select u.id, a.id as advisor_id, first_name,last_name,email,year_born,phone_number,gender,image, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where a.id=%s", [self.kwargs['advisor_id']])
+        g = Advisor_History.objects.filter(advisor_id=a[0].advisor_id)
+        
+
+        return Response({
+            "id": a[0].id,
+            "advisor_id": a[0].advisor_id,
+            "first_name": a[0].first_name,
+            "last_name": a[0].last_name,
+            "phone_number": a[0].phone_number,
+            "is_verified": a[0].is_verified,
+            "daily_begin_time": a[0].daily_begin_time,
+            "daily_end_time": a[0].daily_end_time,
+            "telephone": a[0].telephone,
+            "address": a[0].address,
+            "advise_method": a[0].advise_method,
+            "meli_code": a[0].meli_code,
+            "is_ejucation_advisor": a[0].is_ejucation_advisor,
+            "is_healthcare_advisor": a[0].is_healthcare_advisor,
+            "is_sport_advisor": a[0].is_sport_advisor,
+            "is_family_advisor": a[0].is_family_advisor,
+            "is_mental_advisor": a[0].is_mental_advisor,
+            "granted_prize": g
+        })
+            
 
 
 class ResendVerificationEmail(APIView):
