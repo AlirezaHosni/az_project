@@ -6,7 +6,6 @@ from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey
 
 
-
 class Manager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         """
@@ -175,3 +174,4 @@ class Reservation(models.Model):
             ('education', 'education'),
         ), max_length=11, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    chat = models.ForeignKey("chat.Chat", on_delete=models.CASCADE)

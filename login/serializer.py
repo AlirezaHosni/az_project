@@ -470,7 +470,7 @@ class ReservationSerializer(serializers.ModelSerializer):
                                  end_session_datetime=validated_data['reservation_datetime'] + timedelta(
                                      minutes=validated_data['duration_min']), chat_id=chat.id,
                                  user_id=validated_data['receiver'])
-        reservation = Reservation.objects.create(user_id=self.context['request'].user.id,
+        reservation = Reservation.objects.create(chat_id=chat.id, user_id=self.context['request'].user.id,
                                                  advisor_user_id=validated_data['receiver'],
                                                  reservation_datetime=validated_data['reservation_datetime'],
                                                  end_session_datetime=validated_data[

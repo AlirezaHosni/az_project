@@ -630,7 +630,7 @@ class ListAdvisorReservation(generics.ListAPIView):
     serializer_class = ReservationAdvSerializer
     permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
-        return Reservation.objects.raw("select r.id, r.user_id, r.advisor_user_id, reservation_datetime, end_session_datetime, created_at, first_name, last_name from login_reservation as r inner join login_user as u on r.user_id=u.id where r.advisor_user_id=%s order by reservation_datetime", [self.request.user.id])
+        return Reservation.objects.raw("select r.id, r.user_id, r.advisor_user_id, r.chat_id ,reservation_datetime, end_session_datetime, created_at, first_name, last_name from login_reservation as r inner join login_user as u on r.user_id=u.id where r.advisor_user_id=%s order by reservation_datetime", [self.request.user.id])
     # def get(self, request):
     #     reses = Reservation.objects.filter(advisor_user_id=self.kwargs['advisor_user_id'])
     #     io = []
@@ -679,10 +679,9 @@ class DeleteReservedSessionByAdvisor(APIView):
             # Advisor.objects.filter(user_id=self.kwargs['user_id']).delete()
             # User.objects.filter(id=advisor.user_id).delete()
             res = Reservation.objects.get(id=self.kwargs['reservation_id'])
-            cu = Chat_User.objects.get(user_id=res.user_id)
-            Chat_User.objects.filter(user_id=res.user_id).delete()
-            Chat_User.objects.filter(user_id=res.advisor_user_id).delete()
-            Chat.objects.filter(id=cu.chat_id).delete()
+            Chat_User.objects.filter(chat_id=res.chat_id).delete()
+            Chat.objects.filter(id=res.chat_id).delete()
+            res.delete()
 
             return Response({
                 "message": "رزرو حذف شد"
@@ -696,5 +695,5 @@ class DeleteReservedSessionByAdvisor(APIView):
 class ListAdvisorReservationByAdvId(generics.ListAPIView):
     serializer_class = ReservationAdvSerializer
     def get_queryset(self):
-        return Reservation.objects.raw("select r.id, r.user_id, r.advisor_user_id, reservation_datetime, end_session_datetime, created_at, first_name, last_name from login_reservation as r inner join login_user as u on r.user_id=u.id where r.advisor_user_id=%s order by reservation_datetime", [self.kwargs['advisor_user_id']])
+        return Reservation.objects.raw("select r.id, r.user_id, r.advisor_user_id, r.chat_id ,reservation_datetime, end_session_datetime, created_at, first_name, last_name from login_reservation as r inner join login_user as u on r.user_id=u.id where r.advisor_user_id=%s order by reservation_datetime", [self.kwargs['advisor_user_id']])
    
