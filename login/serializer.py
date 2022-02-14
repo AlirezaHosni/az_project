@@ -440,7 +440,7 @@ class ListNotifiactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notifiaction
-        fields = ['user', 'type', 'contacts', 'created_at', 'reservation']
+        fields = ['user', 'type', 'contacts', 'seen', 'created_at', 'reservation']
 
 
 class UserVerificationSerializer(serializers.ModelSerializer):
