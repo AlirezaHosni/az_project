@@ -378,7 +378,7 @@ class ListNotificationsAPI(generics.ListAPIView):
         oldNotifiactions = Notifiaction.objects.filter(Q(user=self.request.user.id) & Q(seen=False)).order_by('-created_at')
         updatedNotifiactions = oldNotifiactions
 
-        for notification in updatedNotifiactions.values('seen'):
+        for notification in updatedNotifiactions.iterator():
             notification.seen = True
             notification.save()
         
