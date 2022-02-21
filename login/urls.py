@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import ListAdvisorReservationByAdvId, AdvProfileByAdvId, DeleteReservedSessionByAdvisor, ListAdvisorReservation, ResendVerificationEmail, VerifyAdvisor, ListAnalyticalData,  UpdateDocFileStatus, ListAdvisorInfoForAdmin, DownloadFilePDF, DeleteUploadedFile, DownloadFileImage, UploadDocFile, LoginUserAPI, ListReservedDateTimeForParticularAdvisor, ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
+from .views import RetrieveUpdateJobTime, CreateAdvJobTime, ListAdvisorReservationByAdvId, AdvProfileByAdvId, DeleteReservedSessionByAdvisor, ListAdvisorReservation, ResendVerificationEmail, VerifyAdvisor, ListAnalyticalData,  UpdateDocFileStatus, ListAdvisorInfoForAdmin, DownloadFilePDF, DeleteUploadedFile, DownloadFileImage, UploadDocFile, LoginUserAPI, ListReservedDateTimeForParticularAdvisor, ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
 from knox import views as knox_views
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -50,6 +50,8 @@ urlpatterns = [
     path('list-advisor-reservation-details/', ListAdvisorReservation.as_view()),
     path('list-advisor-reservation-details/<int:advisor_user_id>/', ListAdvisorReservationByAdvId.as_view()),
     path('delete-reservation-by-advisor/<int:reservation_id>/', DeleteReservedSessionByAdvisor.as_view()),
+    path('cjt/', CreateAdvJobTime.as_view()),
+    path('rujt/', RetrieveUpdateJobTime.as_view()),
 
 
 ]

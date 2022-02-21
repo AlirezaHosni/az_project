@@ -1,3 +1,4 @@
+from datetime import date
 from django import apps
 from django.contrib.auth.hashers import make_password
 from django.db import models
@@ -175,3 +176,10 @@ class Reservation(models.Model):
         ), max_length=11, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     chat = models.ForeignKey("chat.Chat", on_delete=models.CASCADE)
+
+class AdvisorDailyTime(models.Model):
+    advisor = models.ForeignKey("Advisor", on_delete=models.CASCADE, unique=True)
+    # date = models.DateField()
+    # begin_time = models.TimeField()
+    # end_time = models.TimeField()
+    job_time = models.JSONField()

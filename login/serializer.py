@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import server_error
 from rest_framework.fields import ImageField
 from rest_framework.generics import get_object_or_404
-from .models import Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, \
+from .models import AdvisorDailyTime, Reservation, Email_Verification, Advisor, User, Request, Rate, Advisor_History, \
     Advisor_Document, Invitation, Notifiaction
 from chat.models import Chat_User, Chat
 from django.contrib.auth.hashers import make_password
@@ -540,3 +540,14 @@ class AdvisorAdvSerializer(serializers.ModelSerializer):
         model = Advisor
         fields = '__all__'
         read_only_fields = ['user']
+
+class AdvJobTimeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AdvisorDailyTime
+        fields = ['job_time']
+
+    def create(self, validated_data):
+        advisor_id = Advisor.objects.get(user_id=self.context['request'].user.id).id
+        AdvisorDailyTime.objects.create(advisor_id=advisor_id, job_time=validated_data['job_time'])
+        return validated_data

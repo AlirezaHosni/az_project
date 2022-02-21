@@ -11,9 +11,9 @@ from django.template.loader import render_to_string
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from yaml.tokens import FlowEntryToken
-from .models import Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
+from .models import AdvisorDailyTime, Notifiaction, Email_Verification, Advisor, Reservation, User, Request, Rate, Advisor_History, Advisor_Document , Invitation
 from .permissions import CanReserveDatetime, CanBeActive, IsAdvisor, IsChatDone, IsChatExist, IsNotConfirmed
-from .serializer import AdvisorAdvSerializer, ReservationAdvSerializer, UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
+from .serializer import AdvJobTimeSerializer, AdvisorAdvSerializer, ReservationAdvSerializer, UpdateFileStatusSerializer, ListAdvisorInfoForAdminSerializer, UploadSerializer, reservedSessionSerializer, ReservationSerializer, UserVerificationSerializer, UpdateRateSerializer, AdvisorDocSerializer, RateFinderSerializer, AdvisorInfoSerializer, professionFinder, \
     AdvisorResumeSerializer, ListRateSerializer, RateSerializer, CreateRequestSerializer, RequestUpdateSerializer, \
     RequestSerializer, SearchInfoSerializer, RegisterSerializer, UserSerializer, AdvisorSerializer, CreateInvitationSerializer, ListNotifiactionSerializer
 from rest_framework.response import Response
@@ -697,3 +697,14 @@ class ListAdvisorReservationByAdvId(generics.ListAPIView):
     def get_queryset(self):
         return Reservation.objects.raw("select r.id, r.user_id, r.advisor_user_id, r.chat_id ,reservation_datetime, end_session_datetime, created_at, first_name, last_name from login_reservation as r inner join login_user as u on r.user_id=u.id where r.advisor_user_id=%s order by reservation_datetime", [self.kwargs['advisor_user_id']])
    
+
+class CreateAdvJobTime(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AdvJobTimeSerializer
+
+class RetrieveUpdateJobTime(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AdvJobTimeSerializer
+    def get_object(self):
+        advisor_id = Advisor.objects.get(user_id=self.request.user.id).id
+        return AdvisorDailyTime.objects.get(advisor_id=advisor_id)
