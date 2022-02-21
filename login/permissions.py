@@ -2,7 +2,7 @@ from django.core.mail import message
 from rest_framework import permissions, status
 from rest_framework.generics import get_object_or_404
 from chat.models import Chat_User
-from login.models import Rate, Email_Verification, Reservation, User, Advisor
+from login.models import AdvisorDailyTime, Rate, Email_Verification, Reservation, User, Advisor
 from datetime import timedelta
 from .serializer import ReservationSerializer
 import datetime
@@ -114,3 +114,15 @@ class CanReserveDatetime(permissions.BasePermission):
                 return False
 
         return True
+
+
+class IsJobTimeExist(permissions.BasePermission):
+    message = "برای این مشاور رکورد تایم کاری موجود هست. از همین اندپوینت با متد پوت یا پچ استفاده شود"
+    def has_permission(self, request, view):
+        try:
+            advisor_id = Advisor.objects.get(user_id=request.user.id).id
+            a = AdvisorDailyTime.objects.get(advisor_id=advisor_id)
+            
+        except(AdvisorDailyTime.DoesNotExist):
+            return True
+        return False

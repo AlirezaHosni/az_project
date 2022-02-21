@@ -50,8 +50,8 @@ urlpatterns = [
     path('list-advisor-reservation-details/', ListAdvisorReservation.as_view()),
     path('list-advisor-reservation-details/<int:advisor_user_id>/', ListAdvisorReservationByAdvId.as_view()),
     path('delete-reservation-by-advisor/<int:reservation_id>/', DeleteReservedSessionByAdvisor.as_view()),
-    path('cjt/', CreateAdvJobTime.as_view()),
-    path('rujt/', RetrieveUpdateJobTime.as_view()),
+    path('create-advisor-jobtime/', CreateAdvJobTime.as_view()),
+    path('get-or-update-jobtime/', RetrieveUpdateJobTime.as_view()),
 
 
 ]
