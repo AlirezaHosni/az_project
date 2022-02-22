@@ -237,22 +237,28 @@ class SearchInfoSerializer(serializers.Serializer):
     daily_end_time = serializers.TimeField(allow_null=True)
 
 
-class RequestSerializer(serializers.Serializer):
-    sender_id = serializers.CharField()
-    email = serializers.EmailField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    gender = serializers.CharField()
-    image = serializers.ImageField()
+class RequestSerializer(serializers.ModelSerializer):
+    receiver = AdvisorSerializer(read_only=True)
+    sender = UserSerializer(read_only=True)
 
-    # request model fields
-    id = serializers.CharField()
-    request_content = serializers.CharField()
-    is_checked = serializers.BooleanField()
-    is_blocked = serializers.BooleanField()
-    is_accepted = serializers.BooleanField()
-    created_at = serializers.DateTimeField()
-    is_Done = serializers.BooleanField()
+    class Meta:
+        model = Request
+        fields = '__all__'
+    # sender_id = serializers.CharField()
+    # email = serializers.EmailField()
+    # first_name = serializers.CharField()
+    # last_name = serializers.CharField()
+    # gender = serializers.CharField()
+    # image = serializers.ImageField()
+    #
+    # # request model fields
+    # id = serializers.CharField()
+    # request_content = serializers.CharField()
+    # is_checked = serializers.BooleanField()
+    # is_blocked = serializers.BooleanField()
+    # is_accepted = serializers.BooleanField()
+    # created_at = serializers.DateTimeField()
+    # is_Done = serializers.BooleanField()
 
 
 class CreateRequestSerializer(serializers.ModelSerializer):
@@ -526,23 +532,25 @@ class UpdateFileStatusSerializer(serializers.ModelSerializer):
 class ReservationAdvSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
+
     class Meta:
-        model=Reservation
-        fields='__all__'
-        read_only_fields=['id','advisor_user_id','user_id']
+        model = Reservation
+        fields = '__all__'
+        read_only_fields = ['id', 'advisor_user_id', 'user_id']
 
 
 class AdvisorAdvSerializer(serializers.ModelSerializer):
     granted_prize = serializers.ListField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
+
     class Meta:
         model = Advisor
         fields = '__all__'
         read_only_fields = ['user']
 
-class AdvJobTimeSerializer(serializers.ModelSerializer):
 
+class AdvJobTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdvisorDailyTime
         fields = ['job_time']

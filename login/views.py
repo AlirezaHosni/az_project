@@ -169,7 +169,8 @@ class AdvisorRequestsInfoAPI(generics.ListAPIView):
     #         [self.request.user.id])
 
     def get_queryset(self):
-        return Request.objects.filter(Q(receiver=self.request.user) & Q(is_checked=False))
+        advisor = get_object_or_404(Advisor, user=self.request.user)
+        return Request.objects.filter(Q(receiver=advisor)).order_by('-created_at')
 
 
 class RequestUpdateStatus(generics.UpdateAPIView):
