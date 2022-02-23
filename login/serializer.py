@@ -222,6 +222,7 @@ class SearchInfoSerializer(serializers.Serializer):
     gender = serializers.CharField()
     year_born = serializers.DateTimeField()
     image = serializers.ImageField()
+    status = serializers.CharField()
 
     is_mental_advisor = serializers.BooleanField(allow_null=True)
     is_family_advisor = serializers.BooleanField(allow_null=True)
