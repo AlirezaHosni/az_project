@@ -126,10 +126,32 @@ class ListAdvisorChat(APIView):
             "advisor_chats":each_user_hours
         })
 
-class RetrieveParticularAdvisorChats(generics.ListAPIView):
-    serializer_class = AdvChatSer
-    def get_queryset(self):
-        return Chat_User.objects.raw("select c.id ,user_id, chat_start_datetime, end_session_datetime, time_changed, title from chat_chat_user as cu inner join chat_chat as c on c.id=cu.chat_id where user_id=%s", [self.kwargs['user_id']])
+class RetrieveParticularAdvisorChats(APIView):
+    def get(self, request, *args, **kwargs):
+        chats = Chat_User.objects.raw("select c.id ,user_id, chat_start_datetime, end_session_datetime, time_changed, title from chat_chat_user as cu inner join chat_chat as c on c.id=cu.chat_id where user_id=%s", [self.kwargs['user_id']])
+        objs = []
+        for chat in chats:
+            contact = User.objects.raw("select * from login_user where id in (select user_id from chat_chat_user where chat_id=%s and user_id !=%s)", [chat.id, chat.user_id])
+            for con in contact:
+                objs.append({
+                    "chat": {
+                        "chat_id": chat.id, 
+                        "title": chat.title,
+                        "time_changed": str(chat.time_changed),
+                        "chat_start_datetime": str(chat.chat_start_datetime),
+                        "end_session_datetime":str(chat.end_session_datetime)
+                    },
+                    "contact":{
+                        "id": con.id,
+                        "email": con.email,
+                        "first_name": con.first_name,
+                        "last_name": con.last_name,
+                        "email_confirmed_at": str(con.email_confirmed_at),
+                        "phone_number": con.phone_number,
+                        "status":con.status
+                    }
+                })
+        return Response(objs)
         # chats = Chat.objects.filter(chats_users__user=self.kwargs['user_id'])
         # chat_users = Chat_User.objects.filter(Q(chat__in=chats))
         # return chat_users.exclude(user_id=self.request.user.id).order_by('-chat__time_changed')
