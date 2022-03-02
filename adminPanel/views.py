@@ -2,7 +2,7 @@
 # Create your views here.
 from rest_framework import generics, permissions
 
-from adminPanel.serializer import  ReservationSerializer, RateSerializer, createAdvisorSerializer, ListUsersInfoSerializer, UserSerializer, RateSerializer
+from adminPanel.serializer import  AdvChatSer, ReservationSerializer, RateSerializer, createAdvisorSerializer, ListUsersInfoSerializer, UserSerializer, RateSerializer
 from chat.serializers import ChatListSerializer
 from login.models import Advisor, User, Reservation, Invitation, Rate
 from chat.models import Chat_User, Chat
@@ -127,11 +127,12 @@ class ListAdvisorChat(APIView):
         })
 
 class RetrieveParticularAdvisorChats(generics.ListAPIView):
-    serializer_class = ChatListSerializer
+    serializer_class = AdvChatSer
     def get_queryset(self):
-        chats = Chat.objects.filter(chats_users__user=self.kwargs['user_id'])
-        chat_users = Chat_User.objects.filter(Q(chat__in=chats))
-        return chat_users.exclude(user_id=self.request.user.id).order_by('-chat__time_changed')
+        return Chat_User.objects.raw("select c.id ,user_id, chat_start_datetime, end_session_datetime, time_changed, title from chat_chat_user as cu inner join chat_chat as c on c.id=cu.chat_id where user_id=%s", [self.kwargs['user_id']])
+        # chats = Chat.objects.filter(chats_users__user=self.kwargs['user_id'])
+        # chat_users = Chat_User.objects.filter(Q(chat__in=chats))
+        # return chat_users.exclude(user_id=self.request.user.id).order_by('-chat__time_changed')
 
 class ListReservationDetails(APIView):
 
@@ -185,7 +186,7 @@ class getAdvisorList(APIView):
             records_result = []
             sum_of_serssion_hours = 0
             for rec in data_reservation_datetime:
-                records_result.append(int(rec.end_session_datetime.hour - rec.reservation_datetime.hour))
+                records_result.append(abs(int(rec.end_session_datetime.hour - rec.reservation_datetime.hour)))
             for i in records_result:
                 sum_of_serssion_hours += i
             each_user_hours.append({

@@ -144,3 +144,11 @@ class AdvisorSerializer(serializers.ModelSerializer):
         model = Advisor
         fields = '__all__'
         read_only_fields = ['user_id']
+
+class AdvChatSer(serializers.Serializer):
+    id = serializers.CharField()
+    user_id = serializers.CharField()
+    title = serializers.CharField()
+    time_changed = serializers.CharField()
+    chat_start_datetime = serializers.DateTimeField()
+    end_session_datetime = serializers.DateTimeField()
