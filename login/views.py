@@ -710,3 +710,10 @@ class RetrieveUpdateJobTime(generics.RetrieveUpdateAPIView):
     def get_object(self):
         advisor_id = Advisor.objects.get(user_id=self.request.user.id).id
         return AdvisorDailyTime.objects.get(advisor_id=advisor_id)
+
+class RetrieveUpdateJobTimeWithId(generics.RetrieveUpdateAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AdvJobTimeSerializer
+    def get_object(self):
+        # advisor_id = Advisor.objects.get(id=self.kwargs['advisor_id']).id
+        return AdvisorDailyTime.objects.get(advisor_id=self.kwargs['advisor_id'])
