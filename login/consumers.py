@@ -116,18 +116,21 @@ class RequestConsumer(WebsocketConsumer):
         Chat_User.objects.create(chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
-                                 chat_id=chat.id,
-                                 user_id=user.id)
+                                 chat=chat,
+                                 user=user)
+        print('chat user creating .....')
         Chat_User.objects.create(chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
-                                 chat_id=chat.id,
-                                 user_id=advisor.id)
-        reservation = Reservation.objects.create(user_id=user.id,
-                                                 advisor_user_id=advisor.id,
+                                 chat=chat,
+                                 user=advisor.user)
+        print('reserrvation creating .....')
+        reservation = Reservation.objects.create(user=user,
+                                                 advisor_user=advisor.user,
                                                  reservation_datetime=chat.time_started,
                                                  end_session_datetime=chat.time_started + timedelta(
                                                      minutes=60))
+        print('sending .....')
         self.send(text_data=json.dumps({
             'answer': 'accepted',
             'chat_id': chat.id,
