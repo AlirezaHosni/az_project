@@ -92,7 +92,6 @@ class RequestConsumer(WebsocketConsumer):
 
     def reject_response(self):
 
-
         self.send(text_data=json.dumps({
             'answer': 'rejected',
             'chat_id': '',
@@ -100,7 +99,6 @@ class RequestConsumer(WebsocketConsumer):
         }))
 
     def accept_response(self, advisor, user):
-
 
         chat_title = user.email + ' ' + advisor.user.email
         is_duplicate_chat = Chat.objects.filter(title=chat_title)
@@ -113,10 +111,10 @@ class RequestConsumer(WebsocketConsumer):
             chat = Chat.objects.create(title=chat_title)
         print('chat user creating .....')
         print(chat.id)
-        Chat_User.objects.create(chat_start_datetime=chat.time_started,
+        Chat_User.objects.create(chat_id=chat,
+                                 chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
-                                 chat=chat,
                                  user=user)
         print('chat user creating .....')
         Chat_User.objects.create(chat_start_datetime=chat.time_started,
