@@ -30,6 +30,7 @@ class RequestConsumer(WebsocketConsumer):
                 self.user = get_object_or_404(User, id=self.user_id)
                 # print('user connected')
                 self.advisor = get_object_or_404(Advisor, id=self.scope['url_route']['kwargs']['advisor_id'])
+                print(self.advisor.id)
                 self.group_title = self.user.id + self.advisor.id
                 request_content = self.scope['url_route']['kwargs']['request_content']
                 Request.objects.create(sender=self.user, receiver=self.advisor, request_content=request_content)
