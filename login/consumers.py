@@ -105,10 +105,14 @@ class RequestConsumer(WebsocketConsumer):
         chat_title = user.email + ' ' + advisor.user.email
         is_duplicate_chat = Chat.objects.filter(title=chat_title)
         print(f"is_duplicated {is_duplicate_chat}")
-        if is_duplicate_chat:
+        if is_duplicate_chat.count() != 0:
+            print('if')
             chat = is_duplicate_chat.first()
         else:
+            print('else')
             chat = Chat.objects.create(title=chat_title)
+        print('chat user creating .....')
+        print(chat.id)
         Chat_User.objects.create(chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
