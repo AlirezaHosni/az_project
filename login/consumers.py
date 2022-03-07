@@ -111,23 +111,24 @@ class RequestConsumer(WebsocketConsumer):
             chat = Chat.objects.create(title=chat_title)
         print('chat user creating .....')
         print(chat.id)
-        # Chat_User.objects.create(chat_id=38,
-        #                          chat_start_datetime=chat.time_started,
-        #                          end_session_datetime=chat.time_started + timedelta(
-        #                              minutes=60),
-        #                          user=user)
-        # print('chat user creating .....')
-        # Chat_User.objects.create(chat_start_datetime=chat.time_started,
-        #                          end_session_datetime=chat.time_started + timedelta(
-        #                              minutes=60),
-        #                          chat_id=chat,
-        #                          user=advisor.user)
+        Chat_User.objects.create(chat=chat,
+                                 chat_start_datetime=chat.time_started,
+                                 end_session_datetime=chat.time_started + timedelta(
+                                     minutes=60),
+                                 user=user)
+        print('chat user creating .....')
+        Chat_User.objects.create(chat_start_datetime=chat.time_started,
+                                 end_session_datetime=chat.time_started + timedelta(
+                                     minutes=60),
+                                 chat=chat,
+                                 user=advisor.user)
         print('reserrvation creating .....')
         reservation = Reservation.objects.create(user=user,
                                                  advisor_user=advisor.user,
                                                  reservation_datetime=chat.time_started,
                                                  end_session_datetime=chat.time_started + timedelta(
-                                                     minutes=60))
+                                                     minutes=60),
+                                                 chat=chat)
         print('sending .....')
         self.send(text_data=json.dumps({
             'answer': 'accepted',
