@@ -35,6 +35,7 @@ from rest_framework.authtoken.models import Token
 from chat.models import Chat_User, Chat
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
+from datetime import timedelta
 # run this command for knox
 #   pip install django-rest-knox
 #   pip install drf-spectacular
@@ -84,8 +85,11 @@ class LoginUserAPI(ObtainAuthToken):
         user.last_login=datetime.datetime.now()
         cf = user.email_confirmed_at
         user.save()
-        return Response({'token': token.key,
-        "email_confirmed_at":str(cf)})
+        return Response({
+            'token': token.key,
+            "email_confirmed_at":str(cf),
+            "expiry": str(token.created + timedelta(days=7))
+            })
 
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)

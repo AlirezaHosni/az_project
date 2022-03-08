@@ -46,14 +46,20 @@ class CreateChatSerializer(serializers.ModelSerializer):
         return validated_data
 
 
+class UserSerializerInChat(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'password', 'first_name', 'last_name', 'phone_number', 'gender', 'year_born',
+                  'is_advisor', 'image', 'is_staff', 'status']
+
 class ChatListSerializer(serializers.ModelSerializer):
 
-    user = UserSerializer(read_only=True)
+    user = UserSerializerInChat(read_only=True)
     chat = CreateChatSerializer(read_only=True)
 
     class Meta:
         model = Chat_User
-        fields = ['chat','user']
+        fields = ['chat','user', 'chat_start_datetime', 'end_session_datetime']
 
 
 class MessageSerializer(serializers.ModelSerializer):
