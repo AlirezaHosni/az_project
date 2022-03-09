@@ -204,7 +204,7 @@ class getAdvisorList(APIView):
         users = User.objects.raw("select res.user_id as id, res.id as advisor_id ,res.user_id as user_id, res.created_on, COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name from login_rate as r right join (select a.id,u.id as user_id,created_on,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id) as res on advisor_id =res.id group by res.id order by rate desc")
         each_user_hours = []
         for user in users:
-            data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation where user_id=%s", [user.user_id])
+            data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation where advisor_user_id=%s", [user.user_id])
             records_result = []
             sum_of_serssion_hours = 0
             for rec in data_reservation_datetime:
