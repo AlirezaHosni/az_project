@@ -63,7 +63,7 @@ class RequestConsumer(WebsocketConsumer):
                 print(f"advisor id {self.advisor.id}")
                 request = Request.objects.filter(id=request_id, receiver=self.advisor.id)
                 print(request.count())
-                print(f"user id  {self.request.user.id}")
+                print(f"user id  {request.user.id}")
                 # request = get_object_or_404(Request, id=request_id, receiver=self.advisor)
                 self.user = request.sender
                 request.is_checked = True
