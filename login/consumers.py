@@ -61,8 +61,9 @@ class RequestConsumer(WebsocketConsumer):
                 self.answer = self.scope['url_route']['kwargs']['answer']
                 print(request_id)
                 print(f"advisor id {self.advisor.id}")
-                request = Request.objects.filter(id=request_id, receiver=self.advisor.id)
-                print(request.count())
+                requestResult = Request.objects.filter(id=request_id, receiver=self.advisor.id)
+                request = requestResult.count()
+                print(f"count : {requestResult.count()}")
                 print(f"user id  {request.user.id}")
                 # request = get_object_or_404(Request, id=request_id, receiver=self.advisor)
                 self.user = request.sender
