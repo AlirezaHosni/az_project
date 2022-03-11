@@ -4,7 +4,6 @@ import string
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-import channels.layers
 
 from rest_framework.generics import get_object_or_404
 from login.models import User, Request, Advisor, Reservation, Notifiaction
@@ -34,12 +33,7 @@ class RequestConsumer(WebsocketConsumer):
                 self.group_title = str(self.user.id) + '_' + str(self.advisor.id)
                 request_content = self.scope['url_route']['kwargs']['request_content']
                 Request.objects.create(sender=self.user, receiver=self.advisor, request_content=request_content)
-                # print('request created')
                 # Notifiaction.objects.create(type='r', user_id=self.advisor.id)
-                # print('notification created')
-                # print(f"advisor id {self.advisor.id}")
-                # print(f"user id {self.user.id}")
-                # print(self.group_title)
                 async_to_sync(self.channel_layer.group_add)(
                     self.group_title,
                     self.channel_name
@@ -59,20 +53,12 @@ class RequestConsumer(WebsocketConsumer):
                 self.advisor = get_object_or_404(Advisor, user_id=self.adviser_id)
                 request_id = self.scope['url_route']['kwargs']['request_id']
                 self.answer = self.scope['url_route']['kwargs']['answer']
-                # print(request_id)
-                # print(self.advisor.id)
-                # request = Request.objects.filter(id=request_id, receiver=self.advisor.id)
-                # print(request.count())
                 request = get_object_or_404(Request, id=request_id, receiver=self.advisor)
                 self.user = request.sender
                 request.is_checked = True
                 request.is_accepted = True if (self.answer == 1) else False
                 request.save()
                 self.group_title = str(self.user.id) + '_' + str(self.advisor.id)
-                # print('--------------')
-                # print(self.group_title)
-                # print(f"advisor id {self.advisor.id}")
-                # print(f"user id {self.user.id}")
                 async_to_sync(self.channel_layer.group_add)(
                     self.group_title,
                     self.channel_name
@@ -113,21 +99,8 @@ class RequestConsumer(WebsocketConsumer):
                 'answer': 'rejected',
                 'chat_id': '',
                 'reservation_id': ''
-                # json.dumps({
-                #     'answer': 'accepted',
-                #     'chat_id': chat.id,
-                #     'reservation_id': reservation.id,
-                #     # 'reservation_datetime': reservation.reservation_datetime,
-                #     # 'end_session_datetime': reservation.end_session_datetime
-                # })
             }
         )
-
-        # self.send(text_data=json.dumps({
-        #     'answer': 'rejected',
-        #     'chat_id': '',
-        #     'reservation_id': ''
-        # }))
 
     def accept_response(self, advisor, user):
 
@@ -138,29 +111,23 @@ class RequestConsumer(WebsocketConsumer):
             print('if')
             chat = is_duplicate_chat.first()
         else:
-            print('else')
             chat = Chat.objects.create(title=chat_title)
-        print('chat user creating .....')
-        print(chat.id)
         Chat_User.objects.create(chat=chat,
                                  chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
                                  user=user)
-        print('chat user creating .....')
         Chat_User.objects.create(chat_start_datetime=chat.time_started,
                                  end_session_datetime=chat.time_started + timedelta(
                                      minutes=60),
                                  chat=chat,
                                  user=advisor.user)
-        print('reserrvation creating .....')
         reservation = Reservation.objects.create(user=user,
                                                  advisor_user=advisor.user,
                                                  reservation_datetime=chat.time_started,
                                                  end_session_datetime=chat.time_started + timedelta(
                                                      minutes=60),
                                                  chat=chat)
-        print('sending .....')
         async_to_sync(self.channel_layer.group_send)(
             self.group_title,
             {
@@ -168,22 +135,8 @@ class RequestConsumer(WebsocketConsumer):
                 'answer': 'accepted',
                 'chat_id': chat.id,
                 'reservation_id': reservation.id
-                # json.dumps({
-                #     'answer': 'accepted',
-                #     'chat_id': chat.id,
-                #     'reservation_id': reservation.id,
-                #     # 'reservation_datetime': reservation.reservation_datetime,
-                #     # 'end_session_datetime': reservation.end_session_datetime
-                # })
             }
         )
-        # self.send(text_data=json.dumps({
-        #     'answer': 'accepted',
-        #     'chat_id': chat.id,
-        #     'reservation_id': reservation.id,
-        #     # 'reservation_datetime': reservation.reservation_datetime,
-        #     # 'end_session_datetime': reservation.end_session_datetime
-        # }))
 
     def request_response(self, event):
         message = event['answer']
