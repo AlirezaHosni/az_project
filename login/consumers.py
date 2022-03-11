@@ -59,11 +59,12 @@ class RequestConsumer(WebsocketConsumer):
                 self.advisor = get_object_or_404(Advisor, user_id=self.adviser_id)
                 request_id = self.scope['url_route']['kwargs']['request_id']
                 self.answer = self.scope['url_route']['kwargs']['answer']
-                # print(request_id)
-                # print(self.advisor.id)
-                # request = Request.objects.filter(id=request_id, receiver=self.advisor.id)
-                # print(request.count())
-                request = get_object_or_404(Request, id=request_id, receiver=self.advisor)
+                print(request_id)
+                print(f"advisor id {self.advisor.id}")
+                request = Request.objects.filter(id=request_id, receiver=self.advisor.id)
+                print(request.count())
+                print(f"user id  {self.request.user.id}")
+                # request = get_object_or_404(Request, id=request_id, receiver=self.advisor)
                 self.user = request.sender
                 request.is_checked = True
                 request.is_accepted = True if (self.answer == 1) else False
