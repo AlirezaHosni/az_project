@@ -105,7 +105,7 @@ class ListAdvisorChat(APIView):
         users = User.objects.raw("select u.id, a.id as advisor_id, image, first_name, last_name from login_user as u inner join login_advisor as a on u.id = a.user_id")
         each_user_hours = []
         for user in users:
-            data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation where user_id=%s", [user.id])
+            data_reservation_datetime = Reservation.objects.raw("SELECT id, reservation_datetime, end_session_datetime FROM login_reservation where advisor_user_id=%s", [user.id])
             records_result = []
             sum_of_serssion_hours = 0
             for rec in data_reservation_datetime:
