@@ -109,7 +109,7 @@ class ListAdvisorChat(APIView):
             records_result = []
             sum_of_serssion_hours = 0
             for rec in data_reservation_datetime:
-                records_result.append(int(rec.end_session_datetime.hour - rec.reservation_datetime.hour))
+                records_result.append(abs(int(rec.end_session_datetime.hour - rec.reservation_datetime.hour)))
             for i in records_result:
                 sum_of_serssion_hours += i
             each_user_hours.append({
