@@ -16,7 +16,7 @@ from django.utils import timezone
 
 class CreateUserByAdmin(generics.CreateAPIView):
     serializer_class = UserSerializer
-  #  permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
 class DeleteUserByAdmin(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
