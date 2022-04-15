@@ -136,16 +136,51 @@ class SearchAdvisorAPI(generics.ListAPIView):
     def get_queryset(self):
         search_name = self.kwargs['search']
         search_list = search_name.split(" ")
+        
+        if self.request.GET.get('only_online') == 'true':
+            stat = "and status='online'"
+        else:
+            stat = ''
 
+        if self.request.GET.get('gender') != None:
+            gen = "and gender='" + self.request.GET.get('gender') + "'"
+        else:
+            gen = ''
+
+        if self.request.GET.get('advise_method') != None:
+            am = "and advise_method='" + self.request.GET.get('advise_method') + "'"
+        else:
+            am = ''
+
+        if self.request.GET.get('profession') != None:
+            pro = "and is_" + self.request.GET.get('profession') + "_advisor=1"
+        else:
+            pro = '' 
+
+        if self.request.GET.get('high_rate') == 'true':
+            ra = "order by rate desc"
+        else:
+            ra = ''
+
+        # if len(search_list) <= 1 and self.request.GET.get('only_online') == 'true':
+        #     return User.objects.raw(
+        #         "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where (first_name like %s or last_name like %s) and status = 'online') as res on advisor_id =res.id group by res.id order by rate desc",
+        #         ['%' + search_list[0] + '%', '%' + search_list[0] + '%'])
+        # elif len(search_list) > 1 and self.request.GET.get('only_online') == 'true':
+        #     return User.objects.raw(
+        #         "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where (first_name like %s or last_name like %s) and status = 'online' union (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where (first_name like %s or last_name like %s) and status = 'online')) as res on advisor_id =res.id group by res.id order by rate desc",
+        #         ['%' + search_list[0] + '%', '%' + search_list[0] + '%', '%' + search_list[1] + '%',
+        #          '%' + search_list[1] + '%'])
         if len(search_list) <= 1:
             return User.objects.raw(
-                "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where first_name like %s or last_name like %s) as res on advisor_id =res.id group by res.id order by rate desc",
+                "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status, is_verified, daily_begin_time, daily_end_time,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where (first_name like %s or last_name like %s)"+ stat +" "+ gen +" "+ am +" "+ pro +") as res on advisor_id =res.id group by res.id " + ra,
                 ['%' + search_list[0] + '%', '%' + search_list[0] + '%'])
         elif len(search_list) > 1:
             return User.objects.raw(
-                "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where first_name like %s or last_name like %s union (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where first_name like %s or last_name like %s)) as res on advisor_id =res.id group by res.id order by rate desc",
+                "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where (first_name like %s or last_name like %s) "+ stat +" "+ gen +" "+ am +" "+ pro +" union (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image, status, is_verified, daily_begin_time, daily_end_time, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id where (first_name like %s or last_name like %s) "+ stat +" "+ gen +" "+ am +" "+ pro +")) as res on advisor_id =res.id group by res.id " + ra,
                 ['%' + search_list[0] + '%', '%' + search_list[0] + '%', '%' + search_list[1] + '%',
                  '%' + search_list[1] + '%'])
+        
 
 
 class SendRequestAPI(generics.CreateAPIView):
@@ -293,9 +328,36 @@ class GetAllAdvisorsAPI(generics.ListAPIView):
     serializer_class = SearchInfoSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    
+
     def get_queryset(self):
+        if self.request.GET.get('only_online') == 'true':
+            stat = "and status='online'"
+        else:
+            stat = ''
+
+        if self.request.GET.get('gender') != None:
+            gen = "and gender='" + self.request.GET.get('gender') + "'"
+        else:
+                gen = ''
+
+        if self.request.GET.get('advise_method') != None:
+            am = "and advise_method='" + self.request.GET.get('advise_method') + "'"
+        else:
+                am = ''
+
+        if self.request.GET.get('profession') != None:
+            pro = "and is_" + self.request.GET.get('profession') + "_advisor=1"
+        else:
+                pro = '' 
+
+        if self.request.GET.get('high_rate') == 'true':
+            ra = "order by rate desc"
+        else:
+                ra = ''
+
         return User.objects.raw(
-            'select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, status, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone, res.is_verified from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,status,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone, is_verified from login_user as u inner join login_advisor as a on u.id = a.user_id) as res on advisor_id =res.id group by res.id order by rate desc')
+            "select res.user_id as user_id,res.id,COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name,email,year_born,phone_number,gender,image, is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone, res.is_verified, status from login_rate as r right join (select a.id,u.id as user_id,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone, is_verified, status from login_user as u inner join login_advisor as a on u.id = a.user_id where is_superuser=0 "+ stat +" "+ gen +" "+ am +" "+ pro +") as res on advisor_id =res.id group by res.id " + ra)
 
     # class GetParticularAdvisorsAPI(generics.ListAPIView):
 
