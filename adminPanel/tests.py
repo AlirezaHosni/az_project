@@ -1,5 +1,5 @@
 from rest_framework.test import APITestCase
-from login.models import User, Advisor, Advisor_Document, Advisor_History
+from login.models import User, Advisor, Advisor_Document, Advisor_History, Rate
 from chat.models import Chat, Chat_User, Message
 from django.utils import timezone
 from datetime import timedelta
@@ -27,6 +27,35 @@ class NotAdminTestCase(APITestCase):
             gender="M", year_born=timezone.now(),
             is_active=True,
             is_staff=False,
+        )
+
+        self.advisoruser1 = User.objects.create_user(
+            email="d@d.co", password="2",
+            phone_number="126734",
+            first_name="ady",
+            last_name="mama", is_advisor=True,
+            gender="M", year_born=timezone.now(),
+            is_active=True,
+            is_staff=False,
+        )
+        self.advisor1 = Advisor.objects.create(
+            is_mental_advisor= True,
+            is_family_advisor= False,
+            is_sport_advisor= False,
+            is_healthcare_advisor= False,
+            is_ejucation_advisor= False,
+            meli_code= "54090084",
+            advise_method= "on",
+            address= "shkfjsdkj",
+            telephone= "55387958",
+            user_id = self.advisoruser1.id
+        )
+
+        self.rate = Rate.objects.create(
+            advisor_id = self.advisor1.id,
+            user_id = self.orduser.id,
+            text= "fkgj",
+            rate = "3",
         )
         
         self.tokenadmin = Token.objects.create(user=self.usernotadmin)
@@ -59,6 +88,24 @@ class NotAdminTestCase(APITestCase):
         res = self.client.get('/admin-panel/get-user-info/'+str(self.orduser.id)+'/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_admin_can_list_rates(self):
+        res = self.client.get('/admin-panel/list-users-rates/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+    
+    def test_admin_can_list_particular_advisor_rates(self):
+        res = self.client.get('list-particular-user-rates/'+ str(self.advisor1.id) +'/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+    
+    def test_admin_can_update_rate_status(self):
+        rate_data = {
+            "is_confirmed": True
+        }
+        res = self.client.patch('delete-or-update-comment-status/'+ str(self.rate.id) +'/', rate_data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+    
+    def test_admin_can_delete_rate(self):
+        res = self.client.delete('delete-or-update-comment-status/'+ str(self.rate.id) +'/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
     # def test_notadmin_cannot_get_user_info(self):
     #     res = self.client.get('/admin-panel/list-users/')
     #     self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -83,6 +130,35 @@ class AdminTestCase(APITestCase):
             gender="M", year_born=timezone.now(),
             is_active=True,
             is_staff=False,
+        )
+
+        self.advisoruser1 = User.objects.create_user(
+            email="d@d.co", password="2",
+            phone_number="126734",
+            first_name="ady",
+            last_name="mama", is_advisor=True,
+            gender="M", year_born=timezone.now(),
+            is_active=True,
+            is_staff=False,
+        )
+        self.advisor1 = Advisor.objects.create(
+            is_mental_advisor= True,
+            is_family_advisor= False,
+            is_sport_advisor= False,
+            is_healthcare_advisor= False,
+            is_ejucation_advisor= False,
+            meli_code= "54090084",
+            advise_method= "on",
+            address= "shkfjsdkj",
+            telephone= "55387958",
+            user_id = self.advisoruser1.id
+        )
+
+        self.rate = Rate.objects.create(
+            advisor_id = self.advisor1.id,
+            user_id = self.orduser.id,
+            text= "fkgj",
+            rate = "3",
         )
         
         self.tokenadmin = Token.objects.create(user=self.useradmin)
@@ -118,3 +194,23 @@ class AdminTestCase(APITestCase):
     def test_admin_can_list_users(self):
         res = self.client.get('/admin-panel/list-users/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_admin_can_list_rates(self):
+        res = self.client.get('/admin-panel/list-users-rates/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
+    def test_admin_can_list_particular_advisor_rates(self):
+        res = self.client.get('list-particular-user-rates/'+ str(self.advisor1.id) +'/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
+    def test_admin_can_update_rate_status(self):
+        rate_data = {
+            "is_confirmed": True
+        }
+        res = self.client.patch('delete-or-update-comment-status/'+ str(self.rate.id) +'/', rate_data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
+    def test_admin_can_delete_rate(self):
+        res = self.client.delete('delete-or-update-comment-status/'+ str(self.rate.id) +'/')
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
