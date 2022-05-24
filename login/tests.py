@@ -1,6 +1,7 @@
 # import unittest
+import datetime
 from random import randint
-from login.models import User, Advisor, Advisor_Document, Advisor_History
+from login.models import User, Advisor, Advisor_Document, Advisor_History, AdvisorDailyTime
 from chat.models import Chat, Chat_User, Message
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
@@ -51,6 +52,14 @@ class RegisterTestCase(APITestCase):
             address= "shkfjsdkj",
             telephone= "55387958",
             user_id = self.user2.id
+        )
+        self.advisorDailyTime = AdvisorDailyTime.objects.create(
+            job_time={
+                "date":str(datetime.date.today()),
+                "begin_time":"12:13:12",
+                "end_time":"18:13:12",
+            },
+            advisor_id=self.advisor.id
         )
         self.advisor_doc = Advisor_Document.objects.create(
             doc_file = "Documents/Screenshot_283_HC31hdt.png",
@@ -214,11 +223,11 @@ class RegisterTestCase(APITestCase):
     def test_user_can_reserve_session(self):
         reservation_data = {
             "receiver": self.user2.id,
-            "reservation_datetime": timezone.now() + timedelta(days=randint(1, 30)),
+            "reservation_datetime": timezone.now(),
             "duration_min": randint(1, 60)
         }
-        res = self.client.post('list-or-create-reservation/', reservation_data)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post('/api/list-or-create-reservation/', reservation_data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     # def test_user_cannot_comment_before_has_completed_chat(self):
     #     data = {
@@ -333,11 +342,11 @@ class AdvisorStuffTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_advisor_can_see_resservation_details(self):
-        res = self.client.get('list-advisor-reservation-details/')
+        res = self.client.get('/api/list-advisor-reservation-details/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
     
     def test_advisor_can_see_resservation_details_with_id(self):
-        res = self.client.get('list-advisor-reservation-details/'+ str(self.user.id) +'/')
+        res = self.client.get('/api/list-advisor-reservation-details/'+ str(self.user.id) +'/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     # def test_test_user_cannot_update_another_user_profile(self):

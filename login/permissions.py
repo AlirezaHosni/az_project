@@ -8,7 +8,6 @@ from .serializer import ReservationSerializer
 import datetime
 
 
-
 class IsAdvisor(permissions.BasePermission):
     message = "دعوت فقط از طرف مشاور انجام می‌شود"
     status_code = status.HTTP_403_FORBIDDEN
@@ -26,7 +25,6 @@ class IsChatExist(permissions.BasePermission):
         except(Chat_User.DoesNotExist):
             return False
 
-        
         return True
 
 
@@ -36,7 +34,7 @@ class IsChatDone(permissions.BasePermission):
     def has_permission(self, request, view):
         try:
             chat_user = Chat_User.objects.filter(user=request.user.id, chat=view.kwargs['id']).first()
-            if(chat_user.is_done == False):
+            if (chat_user.is_done == False):
                 return False
         except(Chat_User.DoesNotExist):
             return False
@@ -63,11 +61,12 @@ class IsChatDone(permissions.BasePermission):
 #         return True
 
 class IsNotConfirmed(permissions.BasePermission):
-    message="این نظر قبلا تایید شده است و امکان ویرایش نیست"
+    message = "این نظر قبلا تایید شده است و امکان ویرایش نیست"
+
     def has_permission(self, request, view):
         try:
             rate = Rate.objects.filter(id=view.kwargs['id']).first()
-            if(rate.is_confirmed == True):
+            if (rate.is_confirmed == True):
                 return False
         except(Rate.DoesNotExist):
             return False
@@ -76,6 +75,7 @@ class IsNotConfirmed(permissions.BasePermission):
 
 class CanBeActive(permissions.BasePermission):
     message = "ابتدا در سایت ثبت نام کنید و سپس نسبت به فعالسازی اقدام نمایید"
+
     def has_permission(self, request, view):
         key = Email_Verification.objects.get(user_id=view.kwargs['user_id']).key
         token = view.kwargs['token']
@@ -88,17 +88,20 @@ class CanBeActive(permissions.BasePermission):
 
 class CanReserveDatetime(permissions.BasePermission):
     message = "این بازه زمانی قبلا رزرو شده است یا در بازه کاری مشاور نیست"
+
     def has_permission(self, request, view):
         serialized_data = ReservationSerializer(data=request.data)
         serialized_data.is_valid(raise_exception=True)
         reservation_datetime = serialized_data.validated_data['reservation_datetime']
         end_session_datetime = reservation_datetime + timedelta(minutes=serialized_data.validated_data['duration_min'])
         advisor_user_id = serialized_data.validated_data['receiver']
-        #print(advisor_user_id)
-        record_count = Reservation.objects.raw("select id, is_done from chat_chat_user where user_id in (select user_id from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s))",
-         [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime, advisor_user_id])
+        # print(advisor_user_id)
+        record_count = Reservation.objects.raw(
+            "select id, is_done from chat_chat_user where user_id in (select user_id from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s))",
+            [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime,
+             advisor_user_id])
 
-        advisor_daily_routine = Advisor.objects.get(user_id = serialized_data.validated_data['receiver'])
+        advisor_daily_routine = Advisor.objects.get(user_id=serialized_data.validated_data['receiver'])
 
         if advisor_daily_routine.daily_begin_time == None or advisor_daily_routine.daily_end_time == None:
             return False
@@ -106,7 +109,7 @@ class CanReserveDatetime(permissions.BasePermission):
         if reservation_datetime.time() < advisor_daily_routine.daily_begin_time:
             return False
 
-        if end_session_datetime.time() > advisor_daily_routine.daily_end_time: 
+        if end_session_datetime.time() > advisor_daily_routine.daily_end_time:
             return False
 
         for n in record_count:
@@ -118,11 +121,12 @@ class CanReserveDatetime(permissions.BasePermission):
 
 class IsJobTimeExist(permissions.BasePermission):
     message = "برای این مشاور رکورد تایم کاری موجود هست. از همین اندپوینت با متد پوت یا پچ استفاده شود"
+
     def has_permission(self, request, view):
         try:
             advisor_id = Advisor.objects.get(user_id=request.user.id).id
             a = AdvisorDailyTime.objects.get(advisor_id=advisor_id)
-            
+
         except(AdvisorDailyTime.DoesNotExist):
             return True
         return False

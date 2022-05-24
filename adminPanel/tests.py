@@ -7,7 +7,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 
 
-
 class NotAdminTestCase(APITestCase):
     def setUp(self):
         self.usernotadmin = User.objects.create_user(
@@ -39,72 +38,71 @@ class NotAdminTestCase(APITestCase):
             is_staff=False,
         )
         self.advisor1 = Advisor.objects.create(
-            is_mental_advisor= True,
-            is_family_advisor= False,
-            is_sport_advisor= False,
-            is_healthcare_advisor= False,
-            is_ejucation_advisor= False,
-            meli_code= "54090084",
-            advise_method= "on",
-            address= "shkfjsdkj",
-            telephone= "55387958",
-            user_id = self.advisoruser1.id
+            is_mental_advisor=True,
+            is_family_advisor=False,
+            is_sport_advisor=False,
+            is_healthcare_advisor=False,
+            is_ejucation_advisor=False,
+            meli_code="54090084",
+            advise_method="on",
+            address="shkfjsdkj",
+            telephone="55387958",
+            user_id=self.advisoruser1.id
         )
 
         self.rate = Rate.objects.create(
-            advisor_id = self.advisor1.id,
-            user_id = self.orduser.id,
-            text= "fkgj",
-            rate = "3",
+            advisor_id=self.advisor1.id,
+            user_id=self.orduser.id,
+            text="fkgj",
+            rate="3",
         )
-        
+
         self.tokenadmin = Token.objects.create(user=self.usernotadmin)
         self.api_authentication()
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.tokenadmin.key)
 
-    def test_usernotadmin_cannot_create_user(self):
+    def test_not_admin_cant_create_user(self):
         userdata = {
-                "email":"a.h@gmail.com",
-                "password":"2",
-                "phone_number":"1094522",
-                "first_name":"aa",
-                "gender":"M",
-                "year_born":"2021-07-17 08:27:03",
-                "last_name":"bb",
-                "is_advisor":True
-            }
+            "email": "a.h@gmail.com",
+            "password": "2",
+            "phone_number": "1094522",
+            "first_name": "aa",
+            "gender": "M",
+            "year_born": "2021-07-17 08:27:03",
+            "last_name": "bb",
+            "is_advisor": True
+        }
 
         res = self.client.post('/admin-panel/create-user/', userdata)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_notadmin_cannot_delete_user(self):
-
-        res = self.client.delete('/admin-panel/delete-user/'+str(self.orduser.id)+'/')
+    def test_not_admin_cant_delete_user(self):
+        res = self.client.delete('/admin-panel/delete-user/' + str(self.orduser.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_notadmin_cannot_get_user_info(self):
-        res = self.client.get('/admin-panel/get-user-info/'+str(self.orduser.id)+'/')
+    def test_not_admin_cant_get_user_info(self):
+        res = self.client.get('/admin-panel/get-user-info/' + str(self.orduser.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_admin_can_list_rates(self):
+    def test_nto_admin_cant_list_rates(self):
         res = self.client.get('/admin-panel/list-users-rates/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-    
-    def test_admin_can_list_particular_advisor_rates(self):
-        res = self.client.get('list-particular-user-rates/'+ str(self.advisor1.id) +'/')
+
+    def test_not_admin_cant_list_particular_advisor_rates(self):
+        res = self.client.get('/admin-panel/list-particular-user-rates/' + str(self.advisor1.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-    
-    def test_admin_can_update_rate_status(self):
+
+    def test_not_admin_cant_update_comment_status(self):
         rate_data = {
             "is_confirmed": True
         }
-        res = self.client.patch('delete-or-update-comment-status/'+ str(self.rate.id) +'/', rate_data)
+        res = self.client.patch('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/', rate_data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-    
-    def test_admin_can_delete_rate(self):
-        res = self.client.delete('delete-or-update-comment-status/'+ str(self.rate.id) +'/')
+
+    def test_not_admin_cant_delete_rate(self):
+        res = self.client.delete('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
     # def test_notadmin_cannot_get_user_info(self):
     #     res = self.client.get('/admin-panel/list-users/')
@@ -142,25 +140,25 @@ class AdminTestCase(APITestCase):
             is_staff=False,
         )
         self.advisor1 = Advisor.objects.create(
-            is_mental_advisor= True,
-            is_family_advisor= False,
-            is_sport_advisor= False,
-            is_healthcare_advisor= False,
-            is_ejucation_advisor= False,
-            meli_code= "54090084",
-            advise_method= "on",
-            address= "shkfjsdkj",
-            telephone= "55387958",
-            user_id = self.advisoruser1.id
+            is_mental_advisor=True,
+            is_family_advisor=False,
+            is_sport_advisor=False,
+            is_healthcare_advisor=False,
+            is_ejucation_advisor=False,
+            meli_code="54090084",
+            advise_method="on",
+            address="shkfjsdkj",
+            telephone="55387958",
+            user_id=self.advisoruser1.id
         )
 
         self.rate = Rate.objects.create(
-            advisor_id = self.advisor1.id,
-            user_id = self.orduser.id,
-            text= "fkgj",
-            rate = "3",
+            advisor_id=self.advisor1.id,
+            user_id=self.orduser.id,
+            text="fkgj",
+            rate="3",
         )
-        
+
         self.tokenadmin = Token.objects.create(user=self.useradmin)
         self.api_authentication()
 
@@ -169,26 +167,50 @@ class AdminTestCase(APITestCase):
 
     def test_useradmin_can_create_user(self):
         userdata = {
-                "email":"a.h@gmail.com",
-                "password":"2",
-                "phone_number":"1094522",
-                "first_name":"aa",
-                "gender":"M",
-                "year_born":"2021-07-17 08:27:03",
-                "last_name":"bb",
-                "is_advisor":True
-            }
+            "email": "a.h@gmail.com",
+            "password": "2",
+            "phone_number": "1094522",
+            "first_name": "aa",
+            "gender": "M",
+            "year_born": "2021-07-17 08:27:03",
+            "last_name": "bb",
+            "is_advisor": True
+        }
 
         res = self.client.post('/admin-panel/create-user/', userdata)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-    def test_admin_can_delete_user(self):
+    def test_admin_can_create_advisor(self):
+        data = {
+            "email": "advisor@example.com",
+            "first_name": "ali",
+            "last_name": "mohammadi",
+            "password": "12345678",
+            "phone_number": "09356167889",
+            "gender": "M",
+            "year_born": "2022-05-24 08:27:03",
+            "is_advisor": True,
+            "is_mental_advisor": True,
+            "is_family_advisor": True,
+            "is_sport_advisor": True,
+            "is_healthcare_advisor": True,
+            "is_ejucation_advisor": True,
+            "meli_code": "3871584907",
+            "advise_method": "b",
+            "address": "",
+            "telephone": "",
+            "email_confirmed_at" : ""
+        }
 
-        res = self.client.delete('/admin-panel/delete-user/'+str(self.orduser.id)+'/')
+        res = self.client.post('/admin-panel/create-advisors/', data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_admin_can_delete_user(self):
+        res = self.client.delete('/admin-panel/delete-user/' + str(self.orduser.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_admin_can_get_user_info(self):
-        res = self.client.get('/admin-panel/get-user-info/'+str(self.orduser.id)+'/')
+        res = self.client.get('/admin-panel/get-user-info/' + str(self.orduser.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_admin_can_list_users(self):
@@ -198,19 +220,18 @@ class AdminTestCase(APITestCase):
     def test_admin_can_list_rates(self):
         res = self.client.get('/admin-panel/list-users-rates/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-    
+
     def test_admin_can_list_particular_advisor_rates(self):
-        res = self.client.get('list-particular-user-rates/'+ str(self.advisor1.id) +'/')
+        res = self.client.get('/admin-panel/list-particular-user-rates/' + str(self.advisor1.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-    
+
     def test_admin_can_update_rate_status(self):
         rate_data = {
             "is_confirmed": True
         }
-        res = self.client.patch('delete-or-update-comment-status/'+ str(self.rate.id) +'/', rate_data)
+        res = self.client.patch('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/', rate_data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-    
-    def test_admin_can_delete_rate(self):
-        res = self.client.delete('delete-or-update-comment-status/'+ str(self.rate.id) +'/')
-        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_admin_can_delete_rate(self):
+        res = self.client.delete('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/')
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
