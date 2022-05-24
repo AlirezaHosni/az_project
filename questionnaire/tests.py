@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
-from models import Question, Questionnaire, Questionnaire_User, Answer
+from questionnaire.models import Question, Questionnaire, Questionnaire_User, Answer
 from login.models import User, Advisor
 from rest_framework.authtoken.models import Token
 
@@ -22,7 +22,7 @@ class RegisterUser(APITestCase):
         )
         self.advisorUser = User.objects.create_user(
             email="advisor@gmail.com", password="1",
-            phone_number="09351112222",
+            phone_number="09351116223",
             first_name="alireza",
             last_name="karimi", is_advisor=True,
             gender="M", year_born=timezone.now(),
@@ -61,20 +61,20 @@ class RegisterUser(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
     def test_user_can_start_test_and_fetch_questions(self):
-        response = self.client.post('/questionnaire/start-test')
+        response = self.client.get('/questionnaire/start-test')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_can_answer_question(self):
         data = {
-            "question_id": 0,
-            "score": 0
+            "question_id": self.question.id,
+            "score": 2
         }
         response = self.client.post('/questionnaire/question', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_user_can_finish_test(self):
         data = {
-            "questionnaire_id": 0
+            "questionnaire_id": self.questionnaire.id
         }
         response = self.client.post('/questionnaire/finish-test', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
