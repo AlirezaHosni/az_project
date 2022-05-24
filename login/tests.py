@@ -1,4 +1,5 @@
 # import unittest
+from random import randint
 from login.models import User, Advisor, Advisor_Document, Advisor_History
 from chat.models import Chat, Chat_User, Message
 from rest_framework.test import APITestCase
@@ -210,6 +211,15 @@ class RegisterTestCase(APITestCase):
         response = self.client.post('/chat/send-message/' + str(self.chat_aftertime.id) + '/', {"text":"blah blah"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_user_can_reserve_session(self):
+        reservation_data = {
+            "receiver": self.user2.id,
+            "reservation_datetime": timezone.now() + timedelta(days=randint(1, 30)),
+            "duration_min": randint(1, 60)
+        }
+        res = self.client.post('list-or-create-reservation/', reservation_data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
     # def test_user_cannot_comment_before_has_completed_chat(self):
     #     data = {
     #         "text":"blah",
@@ -322,6 +332,13 @@ class AdvisorStuffTestCase(APITestCase):
         response = self.client.put('/api/user-profile/', data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_advisor_can_see_resservation_details(self):
+        res = self.client.get('list-advisor-reservation-details/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
+    def test_advisor_can_see_resservation_details_with_id(self):
+        res = self.client.get('list-advisor-reservation-details/'+ str(self.user.id) +'/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     # def test_test_user_cannot_update_another_user_profile(self):
     #     data = {
