@@ -5,7 +5,8 @@ from chat.models import Chat_User
 from login.models import AdvisorDailyTime, Rate, Email_Verification, Reservation, User, Advisor
 from datetime import timedelta
 from .serializer import ReservationSerializer
-import datetime
+from datetime import datetime
+import json
 
 
 class IsAdvisor(permissions.BasePermission):
@@ -88,35 +89,45 @@ class CanBeActive(permissions.BasePermission):
 
 class CanReserveDatetime(permissions.BasePermission):
     message = "این بازه زمانی قبلا رزرو شده است یا در بازه کاری مشاور نیست"
-
     def has_permission(self, request, view):
         serialized_data = ReservationSerializer(data=request.data)
         serialized_data.is_valid(raise_exception=True)
         reservation_datetime = serialized_data.validated_data['reservation_datetime']
         end_session_datetime = reservation_datetime + timedelta(minutes=serialized_data.validated_data['duration_min'])
         advisor_user_id = serialized_data.validated_data['receiver']
-        # print(advisor_user_id)
-        record_count = Reservation.objects.raw(
-            "select id, is_done from chat_chat_user where user_id in (select user_id from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s))",
-            [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime,
-             advisor_user_id])
+        #print(advisor_user_id)
+        record_count = Reservation.objects.raw("select id, is_done from chat_chat_user where user_id in (select user_id from login_reservation where (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s) OR (reservation_datetime <= %s AND end_session_datetime >= %s AND advisor_user_id=%s))",
+         [reservation_datetime, reservation_datetime, advisor_user_id, end_session_datetime, end_session_datetime, advisor_user_id])
 
-        advisor_daily_routine = Advisor.objects.get(user_id=serialized_data.validated_data['receiver'])
-
-        if advisor_daily_routine.daily_begin_time == None or advisor_daily_routine.daily_end_time == None:
-            return False
-
-        if reservation_datetime.time() < advisor_daily_routine.daily_begin_time:
-            return False
-
-        if end_session_datetime.time() > advisor_daily_routine.daily_end_time:
-            return False
+        advisor_daily_routine = AdvisorDailyTime.objects.get(advisor__user_id = serialized_data.validated_data['receiver'])
+        job_time_dump = json.dumps(advisor_daily_routine.job_time)
+        job_time_dic = json.loads(job_time_dump)
 
         for n in record_count:
             if n.is_done == False:
                 return False
 
-        return True
+        
+
+        for d in job_time_dic:
+            if reservation_datetime.date() == datetime.strptime(d['date'], '%Y-%m-%d').date():
+                begin_time = datetime.strptime(d['begin_time'], '%H:%M:%S').time()
+                end_time = datetime.strptime(d['end_time'], '%H:%M:%S').time()
+                if reservation_datetime.time() < begin_time:
+                    return False
+                if end_session_datetime.time() > end_time:
+                    return False
+                return True
+            return False
+        return False
+        # if advisor_daily_routine.job_time == None or advisor_daily_routine.job_time == None:
+        #     return False
+
+        # if reservation_datetime.time() < advisor_daily_routine.daily_begin_time:
+        #     return False
+
+        # if end_session_datetime.time() > advisor_daily_routine.daily_end_time: 
+        #     return False
 
 
 class IsJobTimeExist(permissions.BasePermission):

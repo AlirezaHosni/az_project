@@ -54,11 +54,11 @@ class RegisterTestCase(APITestCase):
             user_id = self.user2.id
         )
         self.advisorDailyTime = AdvisorDailyTime.objects.create(
-            job_time={
+            job_time=[{
                 "date":str(datetime.date.today()),
-                "begin_time":"12:13:12",
-                "end_time":"18:13:12",
-            },
+                "begin_time":str(datetime.datetime.now().time().strftime("%H:%M:%S")),
+                "end_time":str((datetime.datetime.now() + datetime.timedelta(hours=8)).time().strftime("%H:%M:%S"))
+            }],
             advisor_id=self.advisor.id
         )
         self.advisor_doc = Advisor_Document.objects.create(
@@ -223,8 +223,8 @@ class RegisterTestCase(APITestCase):
     def test_user_can_reserve_session(self):
         reservation_data = {
             "receiver": self.user2.id,
-            "reservation_datetime": timezone.now(),
-            "duration_min": randint(1, 60)
+            "reservation_datetime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "duration_min": randint(10, 60)
         }
         res = self.client.post('/api/list-or-create-reservation/', reservation_data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
