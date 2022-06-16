@@ -462,7 +462,8 @@ class ActivateAccountAPI(generics.UpdateAPIView):
 
 class ListCreateReservation(generics.ListCreateAPIView):
     serializer_class = ReservationSerializer
-    permission_classes = [permissions.IsAuthenticated, CanReserveDatetime]
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated, CanReserveDatetime]
 
     # def get_queryset(self):
     #     return None

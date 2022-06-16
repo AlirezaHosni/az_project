@@ -101,6 +101,22 @@ class NotAdminTestCase(APITestCase):
         res = self.client.patch('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/', rate_data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_not_admin_cant_get_particular_advisor_info(self):
+        res = self.client.get(f'/admin-panel/get-advisor-info/{self.advisor1.id}/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_not_admin_cant_list_advisors_chat(self):
+        res = self.client.get(f'/admin-panel/list-advisors-chat/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_not_admin_cant_get_particular_advisor_chat(self):
+        res = self.client.get(f'/admin-panel/retrieve-particular-advisor-chats/{self.advisor1.id}/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    # def test_not_admin_cant_list_advisors(self):
+    #     res = self.client.get(f'/admin-panel/list-advisors/')
+    #     self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_not_admin_cant_delete_rate(self):
         res = self.client.delete('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -204,6 +220,24 @@ class AdminTestCase(APITestCase):
 
         res = self.client.post('/admin-panel/create-advisors/', data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_admin_can_get_particular_advisor_info(self):
+        res = self.client.get(f'/admin-panel/get-advisor-info/{self.advisor1.id}/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_admin_can_list_advisors_chat(self):
+        res = self.client.get(f'/admin-panel/list-advisors-chat/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_admin_can_get_particular_advisor_chat(self):
+        res = self.client.get(f'/admin-panel/retrieve-particular-advisor-chats/{self.advisor1.id}/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    # def test_admin_can_list_advisors(self):
+    #     res = self.client.get(f'/admin-panel/list-advisors/')
+    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
 
     def test_admin_can_delete_user(self):
         res = self.client.delete('/admin-panel/delete-user/' + str(self.orduser.id) + '/')

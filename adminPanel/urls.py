@@ -22,7 +22,4 @@ urlpatterns = [
     path('list-advisors/', getAdvisorList.as_view()),
     path('create-advisors/', createAdvisor.as_view()),
     path('get-advisor-info/<int:advisor_id>/', RetrieveAdvisorInfo.as_view()),
-
-
-
 ]

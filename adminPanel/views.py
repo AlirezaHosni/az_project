@@ -34,6 +34,7 @@ class getUserInfo(generics.RetrieveUpdateAPIView):
 
 
 class ListUsersInfo(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     def get(self, request, *args, **kwargs):
         users = User.objects.raw("select id, image, first_name, last_name, created_on from login_user")
         each_user_hours = []
@@ -63,6 +64,7 @@ class ListUsersInfo(APIView):
 
 
 class AdvisorInvitations(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     def get(self, request, *args, **kwargs):
         advisors = User.objects.raw(
             "select u.id, a.id as advisor_id, image, first_name, last_name from login_user as u inner join login_advisor as a on u.id = a.user_id")
@@ -86,6 +88,7 @@ class AdvisorInvitations(APIView):
 
 
 class ListInvitationForAdmin(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     def get(self, request, *args, **kwargs):
         invs = Invitation.objects.raw(
             "select i.id, invitation_content, created_at, image, first_name, last_name FROM login_invitation as i inner join login_user as u on i.student_id = u.id where i.advisor_id=%s",
@@ -105,12 +108,15 @@ class ListInvitationForAdmin(APIView):
 
 
 class DeleteParticularInvitationByAdmin(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def get_object(self):
         return Invitation.objects.get(id=self.kwargs['invitation_id'])
 
 
 class ListAdvisorChat(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
     def get(self, request, *args, **kwargs):
         users = User.objects.raw(
             "select u.id, a.id as advisor_id, image, first_name, last_name from login_user as u inner join login_advisor as a on u.id = a.user_id")
@@ -140,6 +146,7 @@ class ListAdvisorChat(APIView):
 
 
 class RetrieveParticularAdvisorChats(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     def get(self, request, *args, **kwargs):
         chats = Chat_User.objects.raw(
             "select c.id ,user_id, chat_start_datetime, end_session_datetime, time_changed, title from chat_chat_user as cu inner join chat_chat as c on c.id=cu.chat_id where user_id=%s",
@@ -175,6 +182,7 @@ class RetrieveParticularAdvisorChats(APIView):
 
 
 class ListReservationDetails(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def get(self, request, *args, **kwargs):
         res = Reservation.objects.all()
@@ -210,18 +218,19 @@ class ListReservationDetails(APIView):
 
 
 class DeleteReservationByAdmin(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     def get_object(self):
         return Reservation.objects.get(id=self.kwargs['reservation_id'])
 
 
 class createAdvisor(generics.CreateAPIView):
-    # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     serializer_class = createAdvisorSerializer
 
 
 class getAdvisorList(APIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     def get(self, request, *args, **kwargs):
-        # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
         users = User.objects.raw(
             "select res.user_id as id, res.id as advisor_id ,res.user_id as user_id, res.created_on, COUNT(rate) as number_of_rates,avg(rate) as rate,first_name,last_name from login_rate as r right join (select a.id,u.id as user_id,created_on,first_name,last_name,year_born,email,phone_number,gender,image,is_mental_advisor,is_family_advisor,is_sport_advisor, is_healthcare_advisor,is_ejucation_advisor,meli_code,advise_method,address,telephone from login_user as u inner join login_advisor as a on u.id = a.user_id) as res on advisor_id =res.id group by res.id order by rate desc")
         each_user_hours = []
@@ -330,6 +339,7 @@ class UpdateCommentStatus(generics.RetrieveUpdateDestroyAPIView):
 
 
 class RetrieveAdvisorInfo(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     serializer_class = AdvisorSerializer
 
     def get_object(self):
