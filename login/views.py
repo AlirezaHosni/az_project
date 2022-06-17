@@ -22,7 +22,7 @@ from rest_framework import mixins, permissions
 from knox.models import AuthToken
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from knox.views import LoginView as KnoxLoginView
+# from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
@@ -91,15 +91,15 @@ class LoginUserAPI(ObtainAuthToken):
             "expiry": str(token.created + timedelta(days=7))
             })
 
-class LoginAPI(KnoxLoginView):
-    permission_classes = (permissions.AllowAny,)
+# class LoginAPI(KnoxLoginView):
+#     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format=None):
-        serializer = AuthTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return super(LoginAPI, self).post(request, format=None)
+#     def post(self, request, format=None):
+#         serializer = AuthTokenSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         login(request, user)
+#         return super(LoginAPI, self).post(request, format=None)
 
 
 class Logout(APIView):
@@ -183,9 +183,9 @@ class SearchAdvisorAPI(generics.ListAPIView):
         
 
 
-class SendRequestAPI(generics.CreateAPIView):
-    serializer_class = CreateRequestSerializer
-    permission_classes = (permissions.IsAuthenticated,CanReserveDatetime,CanReserveDatetime,)
+# class SendRequestAPI(generics.CreateAPIView):
+#     serializer_class = CreateRequestSerializer
+#     permission_classes = (permissions.IsAuthenticated,CanReserveDatetime,CanReserveDatetime,)
 
 
 class RequestsInfoAPI(generics.ListAPIView):
@@ -212,12 +212,12 @@ class AdvisorRequestsInfoAPI(generics.ListAPIView):
         return Request.objects.filter(Q(receiver=advisor)).order_by('-created_at')
 
 
-class RequestUpdateStatus(generics.UpdateAPIView):
-    serializer_class = RequestUpdateSerializer
-    permission_classes = (permissions.IsAuthenticated, CanReserveDatetime,)
+# class RequestUpdateStatus(generics.UpdateAPIView):
+#     serializer_class = RequestUpdateSerializer
+#     permission_classes = (permissions.IsAuthenticated, CanReserveDatetime,)
 
-    def get_object(self):
-        return Request.objects.get(id=self.kwargs['id'])
+#     def get_object(self):
+#         return Request.objects.get(id=self.kwargs['id'])
 
 
 class CreateInvitationAPI(generics.CreateAPIView):
@@ -513,12 +513,12 @@ class DownloadFileImage(APIView):
             return response
         return None
 
-class DownloadFilePDF(APIView):
-    def get(self, request, *args, **kwargs):
-        file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
-        document = open("media/" + str(file_path), 'rb')
-        response = HttpResponse(FileWrapper(document), content_type='application/pdf')
-        return response
+# class DownloadFilePDF(APIView):
+#     def get(self, request, *args, **kwargs):
+#         file_path = Advisor_Document.objects.get(id=self.kwargs['file_id']).doc_file
+#         document = open("media/" + str(file_path), 'rb')
+#         response = HttpResponse(FileWrapper(document), content_type='application/pdf')
+#         return response
 
 class DeleteUploadedFile(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
