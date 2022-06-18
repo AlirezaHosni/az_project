@@ -129,7 +129,7 @@ class NotAdminTestCase(APITestCase):
     #     res = self.client.get('/admin-panel/list-users/')
     #     self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
     def test_admin_can_see_reservation_details(self):
-        res = self.client.get('/list-reservation-details/')
+        res = self.client.get('/admin-panel/list-reservation-details/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
 
