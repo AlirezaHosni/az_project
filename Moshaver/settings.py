@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     'rest_framework.authtoken',
     'adminPanel',
-    'django_nose',
+    
 ]
 
 MIDDLEWARE = [
@@ -214,11 +214,4 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Use nose to run all tests
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-# Tell nose to measure coverage on the 'foo' and 'bar' apps
-NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=login,adminPanel,questionnaire,chat',
-]
