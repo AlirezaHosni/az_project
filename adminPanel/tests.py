@@ -4,7 +4,7 @@ import io
 from PIL import Image
 
 from rest_framework.test import APITestCase
-from login.models import User, Advisor, Advisor_Document, Advisor_History, Rate
+from login.models import Reservation, User, Advisor, Advisor_Document, Advisor_History, Rate
 from chat.models import Chat, Chat_User, Message
 from django.utils import timezone
 from datetime import timedelta
@@ -128,6 +128,9 @@ class NotAdminTestCase(APITestCase):
     # def test_notadmin_cannot_get_user_info(self):
     #     res = self.client.get('/admin-panel/list-users/')
     #     self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+    def test_admin_can_see_reservation_details(self):
+        res = self.client.get('/list-reservation-details/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class AdminTestCase(APITestCase):
@@ -178,6 +181,16 @@ class AdminTestCase(APITestCase):
             user_id=self.orduser.id,
             text="fkgj",
             rate="3",
+        )
+
+        self.chat1 = Chat.objects.create(title='as1321')
+
+        self.reservation = Reservation.objects.create(
+            chat_id = self.chat1.id,
+            user_id = self.orduser.id,
+            advisor_user_id = self.advisoruser1.id,
+            reservation_datetime = "2023-07-17 08:27:03",
+            end_session_datetime = "2023-07-17 10:27:03"
         )
 
         self.tokenadmin = Token.objects.create(user=self.useradmin)
@@ -276,3 +289,13 @@ class AdminTestCase(APITestCase):
     def test_admin_can_delete_rate(self):
         res = self.client.delete('/admin-panel/delete-or-update-comment-status/' + str(self.rate.id) + '/')
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_admin_can_see_reservation_details(self):
+        res = self.client.get('/admin-panel/list-reservation-details/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_admin_can_delete_reservation(self):
+        res = self.client.delete('/admin-panel/delete-reservation/' + str(self.reservation.id) + '/')
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+    

@@ -1,7 +1,7 @@
 from django.urls import path,include
-from .views import RetrieveUpdateJobTimeWithId, RetrieveUpdateJobTime, CreateAdvJobTime, ListAdvisorReservationByAdvId, AdvProfileByAdvId, DeleteReservedSessionByAdvisor, ListAdvisorReservation, ResendVerificationEmail, VerifyAdvisor, ListAnalyticalData,  UpdateDocFileStatus, ListAdvisorInfoForAdmin, DownloadFilePDF, DeleteUploadedFile, DownloadFileImage, UploadDocFile, LoginUserAPI, ListReservedDateTimeForParticularAdvisor, ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, SendRequestAPI, AdvisorRequestsInfoAPI, RequestUpdateStatus, RequestsInfoAPI, LoginAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
-from knox import views as knox_views
-from rest_framework.authtoken.views import obtain_auth_token
+from .views import RetrieveUpdateJobTimeWithId, RetrieveUpdateJobTime, CreateAdvJobTime, ListAdvisorReservationByAdvId, AdvProfileByAdvId, DeleteReservedSessionByAdvisor, ListAdvisorReservation, ResendVerificationEmail, VerifyAdvisor, ListAnalyticalData,  UpdateDocFileStatus, ListAdvisorInfoForAdmin, DeleteUploadedFile, DownloadFileImage, UploadDocFile, LoginUserAPI, ListReservedDateTimeForParticularAdvisor, ListCreateReservation, ActivateAccountAPI, ListRateForAdminAPI, UpdateRateStatusByAdminAPI, Logout, ListParticularAdvisorDocuments, ListAdvisorResumeByAdvisorIdAPI, ImageApiView, GetUserImageAPI, ListRateByAdvisorIdAPI, BestAdvisorsByProfessionAPI, GetAllAdvisorsAPI, CreateAdvisor, UpdateAdvisorResumeAPI, ListAdvisorResumeAPI,ListRateAPI, CreateRateAPI, AdvisorRequestsInfoAPI, RequestsInfoAPI, SignUpAPI, UserInfoAPI, AdvisorInfoAPI, SearchAdvisorAPI, CreateInvitationAPI, ListNotificationsAPI
+# from knox import views as knox_views
+# from rest_framework.authtoken.views import obtain_auth_token
 
 
 urlpatterns = [

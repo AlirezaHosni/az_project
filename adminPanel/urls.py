@@ -13,7 +13,7 @@ urlpatterns = [
     path('retrieve-particular-advisor-chats/<int:user_id>/', RetrieveParticularAdvisorChats.as_view()),
     path('list-advisors-chat/', ListAdvisorChat.as_view()),
     path('list-reservation-details/', ListReservationDetails.as_view()),
-    path('delete-reservation/<int:reservation_id>', DeleteReservationByAdmin.as_view()),
+    path('delete-reservation/<int:reservation_id>/', DeleteReservationByAdmin.as_view()),
     
     path('delete-or-update-comment-status/<int:rate_id>/', UpdateCommentStatus.as_view()),
     path('list-particular-user-rates/<int:advisor_id>/', ListParticularUserRates.as_view()),
