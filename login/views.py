@@ -429,6 +429,7 @@ class CustomPasswordResetView:
 
 
 class ListParticularAdvisorDocuments(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     serializer_class = AdvisorDocSerializer
 
     def get_queryset(self):
@@ -494,7 +495,7 @@ class ListReservedDateTimeForParticularAdvisor(generics.ListAPIView):
 
 class UploadDocFile(generics.ListCreateAPIView):
     serializer_class = UploadSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Advisor_Document.objects.filter(advisor_id=self.kwargs['advisor_id'])

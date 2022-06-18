@@ -1,3 +1,8 @@
+import os
+import io
+
+from PIL import Image
+
 from rest_framework.test import APITestCase
 from login.models import User, Advisor, Advisor_Document, Advisor_History, Rate
 from chat.models import Chat, Chat_User, Message
@@ -215,7 +220,7 @@ class AdminTestCase(APITestCase):
             "advise_method": "b",
             "address": "",
             "telephone": "",
-            "email_confirmed_at" : ""
+            "email_confirmed_at": ""
         }
 
         res = self.client.post('/admin-panel/create-advisors/', data)
@@ -237,7 +242,9 @@ class AdminTestCase(APITestCase):
     #     res = self.client.get(f'/admin-panel/list-advisors/')
     #     self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-
+    def test_admin_can_get_particular_advisor_chat(self):
+        res = self.client.get(f'/api/list-advisor-documents-by-advisor-id/{self.advisor1.id}/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_admin_can_delete_user(self):
         res = self.client.delete('/admin-panel/delete-user/' + str(self.orduser.id) + '/')
