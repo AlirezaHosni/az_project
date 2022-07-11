@@ -79,7 +79,11 @@ class LoginUserAPI(ObtainAuthToken):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
+        if Token.objects.filter(user=user).exists():
+            Token.objects.filter(user=user).delete()
+            token, created = Token.objects.get_or_create(user=user)
+        else:
+            token, created = Token.objects.get_or_create(user=user)
         user.status = 'online'
         # User.objects.filter(id=user.id).update(last_login=datetime.datetime.now())
         user.last_login=datetime.datetime.now()
