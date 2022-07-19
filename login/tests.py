@@ -257,7 +257,7 @@ class AdvisorStuffTestCase(APITestCase):
             user_id=self.user.id
         )
         self.advisor_doc = Advisor_Document.objects.create(
-            doc_file="Documents/photo.jpg",
+            doc_file="Documents/download-test.png",
             advisor_id=self.advisor.id
         )
         self.advisor_resume = Advisor_History.objects.create(
